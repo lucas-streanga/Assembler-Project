@@ -68,8 +68,12 @@ may be used for S, if the flags should be set. Literals in operations must be pr
 **#**, but string literals must be contained in quotations (**"**) and a null-terminator (character 0) will always be
 appended to them.
 
-## Error Codes
+## Assembly Errors
 
+The Assembler may encounter issues with format in the file. Any improper format will end execution, and will not
+write out to the file. If the file is unwritable, an error occurs as well. Each error code will attempt
+to print the line in the file that the error occurs. The error codes will also print the potential problem
+as well as a couple solutions. 
 
 ### Program memory allocation details
 Virtual memory is variable from run to run and is allocated on the heap. Everything 
@@ -149,11 +153,15 @@ conditionals.
 - 1111  NV
   - Never, never executes regardless of flags.
   
-  ## Program Structure
+## Program Structure
+
+The program is split up into four modules: main, initialization, virtual memory, and decoding. Main contains the main execution and opens the files and writes to the file. Init is used for formatting the file before it can be decoded, for easier decoding. This includes removing whitespace, capitalization, formatting string, etc. Decoding is the largest chunk of the program. Here, each line is decoded into one machine code instruction and the .data section is also converted to binary
+data. The virtual memory is identical to virtual processor, and is used to store the program before it is written to a binary file. 
   
   
 ### Testing
 
+The project was tested extensively with edge cases and improper input to test its functionality/robustness. Valgrind was used for the testing. Segmentation faults and memory leaks were impossible to create in my testing, and there are no improper read/write errors as well, even with faulty input instructions or even incomplete instructions. The only potential issue is on systems that over-commit on memory allocation. If a system over commits memory to malloc(), there is potential to crash the program as malloc() will not return a null pointer but will rather fail silently. This was not an issue on my system as the OS only allows allocation of memory that actually exists, but some systems allow malloc() of extremely large sizes, such as 1000gb, without returning a null pointer.
   
 
 
