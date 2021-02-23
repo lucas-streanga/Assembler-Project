@@ -13,19 +13,22 @@ can be done by editing the PC.
 
 # Sample Program
 ```
-00001000000010000000001111111111 # move 16384 into register 0
-00001010000000000000000000000000 # print r0
-00000000000001000000000000000000 # add r0 and r0 and store in r0 + flags set
-00001010000000000000000000000000 # print r0
-00001000010010111000000000001000 # loop until carryover occurs
-*
-!
+@ This is a sample Program
+@ We will simply loop around and
+@ Print the string "Hello World!"
+MOV: R0, #28 @ Load the address into R0
+LDRH: R1, R0 @ Load the byte char into register 1
+PRNR: R1, char
+ADD: R0, R0, #1 @ increment the address in R0
+CMP: R1, #0
+NEMOVS: R14, #4
+END:
+.data
+"Hello World!"
 ```
-This program will move 16384 into R0 and multiply R0 by two on a loop until a carryover occurs,
-printing R0 each loop.
-Output:
+This program will load and print one character at a time from the string in memory until the null terminator is encountered. 
 ```
-Memory size set to 32 bytes.
+Default memory size of 16384 bytes in use
 Initializing Memory...
 Memory Initialized Successfully.
 CPU Initialized Successfully.
@@ -33,34 +36,23 @@ Loading program into memory...
 
 ***EXECUTION***
 
-R0: 1023
-R0: 2046
-R0: 4092
-R0: 8184
-R0: 16368
-R0: 32736
-R0: 65472
-R0: 130944
-R0: 261888
-R0: 523776
-R0: 1047552
-R0: 2095104
-R0: 4190208
-R0: 8380416
-R0: 16760832
-R0: 33521664
-R0: 67043328
-R0: 134086656
-R0: 268173312
-R0: 536346624
-R0: 1072693248
-R0: 2145386496
-R0: 4290772992
-R0: 4286578688
+R1: H
+R1: e
+R1: l
+R1: l
+R1: o
+R1:  
+R1: W
+R1: o
+R1: r
+R1: l
+R1: d
+R1: !
+R1: 
 
 End opcode recieved.
 Execution ended.
-Virtual Cycles used: 427
+Virtual Cycles used: 359
 ```
 
 ## Usage
