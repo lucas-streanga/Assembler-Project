@@ -17,7 +17,7 @@ word get_data(const std::string & s)
   if(s[0] == ',')
   {
     for(int i = 1; i < s.size(); i++)
-      ret = ret | (s[i] << ((4 - (i)) * 8));
+      ret = ret | (s[i] << ((i-1) * 8));
     return ret;
   }
 

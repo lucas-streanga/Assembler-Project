@@ -66,13 +66,9 @@ int main(int argc, char ** argv)
     i++;
   }
   print_all_memory(mem);
-  for(dword i = 0; i < mem.size; i += 4)
-  {
-    file.seekp(i);
-    word data = *((word *)(mem.data + i));
-    LOG(data);
-    file.write((const char *) &data, 4);
-  }
+  file.seekp(0);
+  file.write((const char *) mem.data, mem.size);
+
 
   return 0;
 }
