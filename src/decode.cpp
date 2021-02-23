@@ -87,6 +87,12 @@ word get_instruction(const std::string & s, word line)
     s_flag = token[3];
     opcode = token.substr(0, 3);
   }
+  else if(token.size() == 5)
+  {
+    conditional = token.substr(0, 2);
+    s_flag = 0;
+    opcode = token.substr(2, 3);
+  }
   else if(token.size() == 6)
   {
     conditional = token.substr(0, 2);
