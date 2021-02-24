@@ -35,7 +35,7 @@ $(OBJ4) : $(SRC4) $(HFILES)
 $(OBJ5) : $(SRC5) $(HFILES)
 	g++ $(INCDIR) -c $(CFLAGS) $(SRC5) -o $(OBJ5)
 
-debug: CFLAGS = -g -DDEBUG=1
+debug: CFLAGS = -g -Wall -DDEBUG=1
 debug: all
 
 cleanup:

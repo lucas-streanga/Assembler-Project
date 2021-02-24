@@ -35,7 +35,7 @@ int main(int argc, char ** argv)
   CHK_ERR;
   format_string_literals(input);
 
-  LOG("Formatted Program");
+  LOG("\n***Formatted Program***\n");
   for(dword i = 0; i < input.size(); i++)
     LOG(input[i]);
 

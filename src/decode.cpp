@@ -11,47 +11,48 @@ word get_data(const std::string & s)
 
   bool is_number = true;
   bool is_decimal = false;
-  dword num = 0;
   word ret = 0;
 
   if(s[0] == ',')
   {
-    for(int i = 1; i < s.size(); i++)
+    for(dword i = 1; i < s.size(); i++)
       ret = ret | (s[i] << ((i-1) * 8));
 
     return ret;
   }
 
   for(dword i = 0; i < s.size(); i++)
+  {
     if(!isdigit(s[i]))
       is_number = false;
     else if(s[i] == '.')
       is_decimal = true;
+  }
 
-    if(is_number && !is_decimal)
+  if(is_number && !is_decimal)
+  {
+    try
     {
-      try
-      {
-        ret = stoll(s) & MAX_U;
-      }
-      catch(...)
-      {
-        ret = 0;
-      }
+      ret = stoll(s) & MAX_U;
     }
-    else if(is_decimal)
+    catch(...)
     {
-      try
-      {
-        ret = stof(s);
-      }
-      catch(...)
-      {
-        ret = 0;
-      }
+      ret = 0;
     }
+  }
+  else if(is_decimal)
+  {
+    try
+    {
+      ret = stof(s);
+    }
+    catch(...)
+    {
+      ret = 0;
+    }
+  }
 
-    return ret;
+  return ret;
 
 }
 
@@ -152,7 +153,7 @@ word op_prnm(byte op, byte cond, byte s, std::string& rest, const std::string& i
     if(!str.empty())
       arguments.push_back(str);
   }
-  for(int i = 0; i < arguments.size(); i++)
+  for(word i = 0; i < arguments.size(); i++)
     LOG(arguments[i]);
   if(arguments.size() < 3 || arguments.size() > 4)
     error_handler(ERR_INA, line, ins.c_str());
@@ -164,7 +165,7 @@ word op_prnm(byte op, byte cond, byte s, std::string& rest, const std::string& i
       arguments[i].erase(0, 1);
 
   spec = arguments[arguments.size() - 1];
-  if(spec == "unit")
+  if(spec == "uint")
     specifier = 0;
   else if(spec == "int")
     specifier = 1;
@@ -277,14 +278,14 @@ word op_prnr(byte op, byte cond, byte s, std::string& rest, const std::string& i
     if(!str.empty())
       arguments.push_back(str);
   }
-  for(int i = 0; i < arguments.size(); i++)
+  for(word i = 0; i < arguments.size(); i++)
     LOG(arguments[i]);
   if(arguments.size() < 2 || arguments.size() > 5)
     error_handler(ERR_INA, line, ins.c_str());
 
   num_registers = arguments.size() - 1;
   spec = arguments[arguments.size() - 1];
-  if(spec == "unit")
+  if(spec == "uint")
     specifier = 0;
   else if(spec == "int")
     specifier = 1;
@@ -350,7 +351,7 @@ word op_ldrstr(byte op, byte cond, byte s, std::string& rest, const std::string&
     if(!str.empty())
       arguments.push_back(str);
   }
-  for(int i = 0; i < arguments.size(); i++)
+  for(word i = 0; i < arguments.size(); i++)
     LOG(arguments[i]);
   if(arguments.size() < 2 || arguments.size() > 3)
     error_handler(ERR_INA, line, ins.c_str());
@@ -459,7 +460,7 @@ word op_addsub(byte op, byte cond, byte s, std::string& rest, const std::string&
     if(!str.empty())
       arguments.push_back(str);
   }
-  for(int i = 0; i < arguments.size(); i++)
+  for(word i = 0; i < arguments.size(); i++)
     LOG(arguments[i]);
 
   if(arguments.size() < 3 || arguments.size() > 4)
