@@ -18,6 +18,7 @@ word get_data(const std::string & s)
   {
     for(int i = 1; i < s.size(); i++)
       ret = ret | (s[i] << ((i-1) * 8));
+
     return ret;
   }
 
@@ -50,10 +51,7 @@ word get_data(const std::string & s)
       }
     }
 
-
-
     return ret;
-
 
 }
 

@@ -6,13 +6,13 @@ Virtual_memory::Virtual_memory(size_t size)
 {
   LOG("Initializing Memory...");
   this->size = size;
-  data = (word *) malloc(size * 4);
+  data = (byte *) malloc(size * 4);
   if(data == NULL)
     error_handler(ERR_UTA, 0, NULL);
   for(dword i = 0; i < size; i++)
     data[i] = 0;
 
-  LOG("Memory Initialized Successfully to " << size << " words.");
+  LOG("Memory Initialized Successfully to " << size << " bytes");
 }
 
 Virtual_memory::~Virtual_memory()
@@ -21,7 +21,7 @@ Virtual_memory::~Virtual_memory()
     free(this->data);
 }
 
-word& Virtual_memory::operator[](dword index)
+byte& Virtual_memory::operator[](dword index)
 {
   return this->data[index];
 }
