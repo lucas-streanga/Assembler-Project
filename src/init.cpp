@@ -146,8 +146,8 @@ dword get_size(std::vector<std::string> & input)
 
 void print_all_memory(Virtual_memory &mem)
 {
-  printf("***PRINTING MEMORY***\n");
+  printf("***INSTRUCTION BINARY***\n");
   for(size_t i = 0; i < mem.size; i += 4)
-    printf("%-12lu%010lu\t%lX\n", i, *((word *)(mem.data + i)), *((word *)(mem.data + i)));
+    printf("%-12" PRIu64 "%010" PRIu32 "\t%" PRIX32 "\n", i, *((word *)(mem.data + i)), *((word *)(mem.data + i)));
   printf("***DONE***\n");
 }

@@ -51,8 +51,7 @@ $(OBJ4) : $(SRC4) $(HFILES)
 $(OBJ5) : $(SRC5) $(HFILES)
 	g++ $(INCDIR) -c $(CFLAGS) $(TCOMP) $(SHOW_ALLOCCOMP) $(SRC5) -o $(OBJ5)
 
-debug: CFLAGS = -g -Wall -fsanitize=address -DDEBUG=1
-	LDFLAGS = -fsanitize=address
+debug: CFLAGS = -g -Wall  -DDEBUG=1
 debug: all
 
 cleanup:

@@ -1,7 +1,7 @@
 #ifndef _ASM_DEFINES_H
 #define _ASM_DEFINES_H
 
-#include<stdint.h>
+#include<inttypes.h>
 
 /* Terminal Colors */
 #define TERM_COLOR_RESET "\033[0m"
@@ -108,6 +108,9 @@ extern bool error_occurred;
 #define PRNM_IMMED_MAX  (0b00000000000000000011111111111111)
 #define PRNM_SHIFT_MAX  (0b00000000000000000000001111111111)
 
+//For printing correct size ints
+#define __STDC_FORMAT_MACROS
+
 /* Typedefs */
 typedef uint8_t byte;
 typedef uint16_t half;
@@ -139,7 +142,7 @@ struct timer
   }
 };
 #else
-#define TIMER
+#define TIMER(x)
 #endif
 
 
