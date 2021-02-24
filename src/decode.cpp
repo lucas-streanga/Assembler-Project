@@ -69,8 +69,8 @@ word get_instruction(const std::string & s, word line)
   if(s.find(delim) == std::string::npos)
     error_handler(ERR_FOP, line, s.c_str());
 
-  std::string token = s.substr(0, s.find(delim));
-  std::string rest = s.substr(s.find(delim) + 1, s.size());
+  const std::string & token = s.substr(0, s.find(delim));
+  const std::string  & rest = s.substr(s.find(delim) + 1, s.size());
 
   //We need to get the condtionals and the s_flag
   //3 is no condtional or condtionals
@@ -118,7 +118,7 @@ word get_instruction(const std::string & s, word line)
   return ret;
 }
 
-word decode(byte op, byte cond, byte s, std::string& rest, const std::string& ins, word line)
+word decode(byte op, byte cond, byte s, const std::string& rest, const std::string& ins, word line)
 {
   word ret;
   if(op <= 1)
@@ -135,7 +135,7 @@ word decode(byte op, byte cond, byte s, std::string& rest, const std::string& in
   return ret;
 }
 
-word op_prnm(byte op, byte cond, byte s, std::string& rest, const std::string& ins, word line)
+word op_prnm(byte op, byte cond, byte s, const std::string& rest, const std::string& ins, word line)
 {
   /* shift is 10 bits with 4 bit reg */
   /* or immed value of 14 bits */
@@ -262,7 +262,7 @@ word op_prnm(byte op, byte cond, byte s, std::string& rest, const std::string& i
 
 }
 
-word op_prnr(byte op, byte cond, byte s, std::string& rest, const std::string& ins, word line)
+word op_prnr(byte op, byte cond, byte s, const std::string& rest, const std::string& ins, word line)
 {
   dword num_registers, specifier;
   word R[4] = {0};
@@ -336,7 +336,7 @@ word op_prnr(byte op, byte cond, byte s, std::string& rest, const std::string& i
 
 }
 
-word op_ldrstr(byte op, byte cond, byte s, std::string& rest, const std::string& ins, word line)
+word op_ldrstr(byte op, byte cond, byte s, const std::string& rest, const std::string& ins, word line)
 {
   dword Rd, Rn, immed, shift = 0;
   byte I = 0;
@@ -446,7 +446,7 @@ word op_ldrstr(byte op, byte cond, byte s, std::string& rest, const std::string&
   return ret;
 }
 
-word op_addsub(byte op, byte cond, byte s, std::string& rest, const std::string& ins, word line)
+word op_addsub(byte op, byte cond, byte s, const std::string& rest, const std::string& ins, word line)
 {
   dword Rd, Rn, op2, shift = 0;
   byte I = 0;

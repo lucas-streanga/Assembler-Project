@@ -14,9 +14,56 @@
 
 bool error_occurred;
 
+#if SHOW_ALLOC == 1
+#include <new>
+
+struct alloc_details
+{
+  word total_bytes_allocated = 0;
+  word total_bytes_free = 0;
+  word number_of_allocs = 0;
+  word number_of_frees = 0;
+
+  word current_usage()
+  {
+    return total_bytes_allocated - total_bytes_free;
+  }
+
+};
+
+static alloc_details s_alloc_details;
+
+void* operator new(std::size_t size)
+{
+    s_alloc_details.total_bytes_allocated += size;
+    s_alloc_details.number_of_allocs++;
+    ALLOC_PRINT("New object created on heap with size " << size);
+    void* result = malloc(size);
+    if (result) return result;
+    else
+      throw std::bad_alloc();
+}
+void operator delete(void* ptr)
+{
+  s_alloc_details.number_of_frees++;
+  ALLOC_PRINT("Object deleted off of heap.");
+  if (ptr)
+    free(ptr);
+}
+void* operator new[](std::size_t size)
+{
+  return operator new(size);  // defer to non-array version
+}
+void operator delete[](void* ptr)
+{
+  operator delete(ptr);  // defer to non-array version
+}
+#endif
+
 int main(int argc, char ** argv)
 {
   TIMER("Whole Program");
+  {
   error_occurred = 0;
   if(argc < 2)
     error_handler(ERR_NFS, 0, NULL);
@@ -69,7 +116,9 @@ int main(int argc, char ** argv)
   print_all_memory(mem);
   file.seekp(0);
   file.write((const char *) mem.data, mem.size);
-
+}
+  ALLOC_PRINT("*** Total objects allocated " << s_alloc_details.number_of_allocs);
+  ALLOC_PRINT("*** Total objects freed " << s_alloc_details.number_of_frees);
 
   return 0;
 }

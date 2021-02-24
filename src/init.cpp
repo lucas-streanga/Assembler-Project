@@ -1,6 +1,7 @@
 #include"init.h"
 #include"asm_defines.h"
 #include"Virtual_memory.h"
+#include<cstring>
 
 void inline STRING_TO_LOWER(std::string& s)
 {
@@ -57,10 +58,9 @@ void format_string_literals(std::vector<std::string> & input)
       input[i].push_back('\0');
       for(dword z = 0; z < input[i].size(); z+=4)
       {
-        std::string fourchar;
-        fourchar = ',' + input[i].substr(z, 4);
-        while(fourchar.size() != 5)
-          fourchar.push_back('\0');
+        char fourchar[6] = {0};
+        fourchar[0] = ',';
+        strcpy(fourchar + 1, input[i].substr(z, 4).c_str());
         input.insert(input.begin() + i + (z/4) + 1, fourchar);
       }
       input.erase(input.begin() + i);
@@ -73,20 +73,17 @@ void get_input(std::vector<std::string> & input)
 {
   while(std::cin)
   {
-    std::string input_line;
-    getline(std::cin, input_line);
-    input.push_back(input_line);
+    input.push_back("");
+    getline(std::cin, input[input.size() - 1]);
   }
 }
 
 void format(std::vector<std::string> & input)
 {
-  std::vector<std::string> ret;
-  std::vector<std::string> err;
   bool reached_data = false;
   for(dword i = 0; i < input.size(); i++)
   {
-      std::string input_line = input[i];
+      std::string & input_line = input[i];
       for(dword j = 0; j < input_line.size(); j++)
         if(input_line[j] == '@')
           input_line.erase(input_line.begin() + j, input_line.end());
@@ -97,7 +94,6 @@ void format(std::vector<std::string> & input)
       if(input_line == ".data")
       {
         reached_data = true;
-        ret.push_back(input_line);
         continue;
       }
 
@@ -110,7 +106,6 @@ void format(std::vector<std::string> & input)
               if(!std::isdigit(input_line[k]))
               {
                 error_handler(ERR_LNN, i+1, input_line.c_str());
-                input = err;
                 return;
               }
 
@@ -118,22 +113,22 @@ void format(std::vector<std::string> & input)
             if(w > MAX_U)
             {
               error_handler(ERR_LTL, i+1, input_line.c_str());
-              input = err;
               return;
             }
           }
           catch(const std::out_of_range& e)
           {
             error_handler(ERR_LTL, i+1, input_line.c_str());
-            input = err;
             return;
           }
         }
 
-      if(!input_line.empty())
-        ret.push_back(input_line);
+      if(input_line.empty())
+      {
+        input.erase(input.begin() + i);
+        i--;
+      }
   }
-  input = ret;
   return;
 }
 

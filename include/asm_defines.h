@@ -9,13 +9,23 @@
 #define TERM_COLOR_LOG "\033[35m"
 #define TERM_COLOR_ERROR "\033[1m\033[31m"
 #define TERM_COLOR_TIMER "\033[32m"
+#define TERM_COLOR_ALLOC "\u001b[34m"
 
+/* Debugging for LOG macro and also new overloading to view mallocs on heap. */
 #if DEBUG == 1
 #include<iostream>
 #define LOG(x) std::cout << TERM_COLOR_LOG << x << TERM_COLOR_RESET << '\n'
 #include<iomanip>
 #else
 #define LOG(x)
+#endif
+
+#if SHOW_ALLOC == 1
+#include<iostream>
+#define ALLOC_PRINT(x) std::cout << TERM_COLOR_ALLOC << x << TERM_COLOR_RESET << '\n'
+#include<iomanip>
+#else
+#define ALLOC_PRINT(x)
 #endif
 
 #define MAX_U         4294967295L
