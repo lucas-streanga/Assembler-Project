@@ -129,6 +129,8 @@ word decode(byte op, byte cond, byte s, const std::string& rest, const std::stri
     ret = op_prnr(op, cond, s, rest, ins, line);
   else if(op == 11)
     ret = op_prnm(op, cond, s, rest, ins, line);
+  else if(op == 12)
+    ret = op_brn(op, cond, s, rest, ins, line);
   else if(op == OP_END)
     ret = MAX_U;
 
@@ -562,6 +564,62 @@ word op_addsub(byte op, byte cond, byte s, const std::string& rest, const std::s
 
 }
 
+word op_brn(byte op, byte cond, byte s, const std::string& rest, const std::string& ins, word line)
+{
+  dword shift = 0;
+  byte neg = 0;
+  std::stringstream ss(rest);
+  std::vector<std::string> arguments;
+  //We need to break this up with delimiting commas
+  while(ss.good())
+  {
+    std::string str;
+    getline(ss, str, ',');
+    if(!str.empty())
+      arguments.push_back(str);
+  }
+  for(word i = 0; i < arguments.size(); i++)
+    LOG(arguments[i]);
+
+  if(arguments.size() != 1)
+    error_handler(ERR_INA, line, ins.c_str());
+
+  //Set the negative bit to 1
+  if(arguments[0][0] == '#')
+  {
+    arguments[0].erase(0, 1);
+  }
+  if(arguments[0][0] == '-')
+  {
+    neg = 1;
+    arguments[0].erase(0, 1);
+  }
+
+  try
+  {
+    shift = stoll(arguments[0]);
+  }
+  catch(const std::invalid_argument & e)
+  {
+    error_handler(ERR_URR, line, ins.c_str());
+  }
+  catch(const std::out_of_range & e)
+  {
+    error_handler(ERR_URR, line, ins.c_str());
+  }
+  if(shift > BRN_SHIFT_MAX)
+    error_handler(ERR_URI, line, ins.c_str());
+
+  LOG("Instruction Decoded:");
+  LOG("Negative? " << (int) neg);
+  LOG("Offset: " << (unsigned int) shift);
+
+  word ret = (op << 24) | (cond << 20) | (neg << 19) | (shift);
+
+  LOG("INSTRUCTION:\n" << (unsigned long int) ret);
+  return ret;
+}
+
 byte str_to_op(const std::string & opcode, char s_flag, word line)
 {
   if(opcode == "add")
@@ -588,6 +646,8 @@ byte str_to_op(const std::string & opcode, char s_flag, word line)
     return OP_PRNR;
   else if(opcode == "prn" && s_flag == 'm')
     return OP_PRNM;
+  else if(opcode == "brn")
+    return OP_BRN;
   else if(opcode == "end")
     return OP_END;
   else

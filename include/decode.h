@@ -18,5 +18,6 @@ word op_addsub(byte op, byte cond, byte s, const std::string &, const std::strin
 word op_ldrstr(byte op, byte cond, byte s, const std::string &, const std::string &, word);
 word op_prnr(byte op, byte cond, byte s, const std::string &, const std::string &, word);
 word op_prnm(byte op, byte cond, byte s, const std::string &, const std::string &, word);
+word op_brn(byte op, byte cond, byte s, const std::string &, const std::string &, word);
 
 #endif
