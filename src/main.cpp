@@ -63,7 +63,7 @@ void operator delete[](void* ptr)
 int main(int argc, char ** argv)
 {
   TIMER("Whole Program");
-  {
+{
   error_occurred = 0;
   if(argc < 2)
     error_handler(ERR_NFS, 0, NULL);
