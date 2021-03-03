@@ -17,11 +17,12 @@ can be done by editing the PC.
 @ We will simply loop around and
 @ Print the string "Hello World!"
 MOV: R0, #28 @ Load the address into R0
+.start_loop
 LDRH: R1, R0 @ Load the byte char into register 1
 PRNR: R1, char
 ADD: R0, R0, #1 @ increment the address in R0
 CMP: R1, #0
-NEMOVS: R14, #4
+NEBRN: .start_loop
 END:
 .data
 "Hello World!"
@@ -63,7 +64,9 @@ The user program should be written in plain text. Comments can be added with the
 and will be ignored. Whitespace is ignored as well. Capitalization is ignored in everything except string literals. 
 All operations must seperate the operands and the opcode
 with a **:**. The first two characters of the operation may be used for a conditional, and the last character 
-may be used for S, if the flags should be set. Literals in operations must be prefaced with a **#**. The label
+may be used for S, if the flags should be set. Literals in operations must be prefaced with a **#**. Labels may be 
+specified with the **.** prefix to some name, and labels may be used with branches. The address of the labels used 
+in branching is PC-relative and computed at assembly time. The label
 *.data* must be used to indicate data that is not instructions. In the data sections, literals do not require
 **#**, but string literals must be contained in quotations (**"**) and a null-terminator (character 0) will always be
 appended to them.
@@ -106,6 +109,8 @@ The current defined opcodes are as follows:
   - Print content of up to 4 registers.
 - 11: PRNM
   - Print value at memory address.
+- 12: BRN
+  - Branch with a PC relative value. 
 - 255: END
    - End execution.
 ## Registers
