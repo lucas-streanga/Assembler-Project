@@ -10,7 +10,7 @@
 #include"Virtual_memory.h"
 #include"decode.h"
 #include<cstring>
-#include <arpa/inet.h>
+#include<map>
 
 bool error_occurred;
 
@@ -76,11 +76,21 @@ int main(int argc, char ** argv)
 
   CHK_ERR;
   std::vector<std::string> input;
+  std::map<std::string, word> labels;
 
   get_input(input);
   CHK_ERR;
   format(input);
   CHK_ERR;
+  resolve_labels(input, labels);
+
+  //Debug log the labels.
+  LOG("labels:");
+  for(std::map<std::string, word>::iterator it = labels.begin(); it != labels.end(); it++)
+  {
+    LOG(it->first << " " << it->second);
+  }
+
   format_string_literals(input);
 
   LOG("\n***Formatted Program***\n");
@@ -101,7 +111,7 @@ int main(int argc, char ** argv)
   dword i = 0;
   while(input[i] != ".data")
   {
-    word ins = get_instruction(input[i], i+1);
+    word ins = get_instruction(input[i], i+1, labels);
     memcpy(mem.data + (i * 4), &ins, 4);
     CHK_ERR;
     i++;

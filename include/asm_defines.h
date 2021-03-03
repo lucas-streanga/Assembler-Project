@@ -99,6 +99,8 @@ extern bool error_occurred;
 #define ERR_NFS   11
 //Unable to open file
 #define ERR_UOF   12
+//Unknown label
+#define ERR_UKL   13
 
 
 #define AS_IMMED_MAX    (0b00000000000000000000001111111111)

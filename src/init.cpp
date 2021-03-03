@@ -2,6 +2,7 @@
 #include"asm_defines.h"
 #include"Virtual_memory.h"
 #include<cstring>
+#include<map>
 
 void inline STRING_TO_LOWER(std::string& s)
 {
@@ -96,6 +97,9 @@ void format(std::vector<std::string> & input)
         reached_data = true;
         continue;
       }
+      //This is a label. Skip it
+      if(input_line[0] == '.')
+        continue;
 
       if(reached_data)
         if(input_line.find('"') == std::string::npos && !input_line.empty())
@@ -137,11 +141,25 @@ dword get_size(std::vector<std::string> & input)
   dword num_words = 0;
   for(dword i = 0; i < input.size(); i++)
   {
-    if(input[i] != ".data" && input[i] != "!")
+    if(input[i][0] != '.' && input[i] != "!")
       num_words++;
   }
 
   return num_words;
+}
+
+void resolve_labels(std::vector<std::string> & input, std::map<std::string, word> & labels)
+{
+  //Iterate thru the input and put each label with its address into the map
+  for(dword i = 0; i < input.size(); i++)
+  {
+    if(input[i][0] == '.' && input[i] != ".data")
+    {
+      labels[input[i]] = i;
+      input.erase(input.begin() + i);
+      i--;
+    }
+  }
 }
 
 void print_all_memory(Virtual_memory &mem)

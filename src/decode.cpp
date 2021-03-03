@@ -56,7 +56,7 @@ word get_data(const std::string & s)
 
 }
 
-word get_instruction(const std::string & s, word line)
+word get_instruction(const std::string & s, word line, std::map<std::string, word> & labels)
 {
   //We need to do string parsing to get the instruction.
   //First, we need to find out if the delimiter is there
@@ -114,11 +114,11 @@ word get_instruction(const std::string & s, word line)
   LOG("Conditional " << conditional << " " << (int) cond);
   LOG("S set? " << (int) sbit);
 
-  word ret = decode(op, cond, sbit, rest, s, line);
+  word ret = decode(op, cond, sbit, rest, s, line, labels);
   return ret;
 }
 
-word decode(byte op, byte cond, byte s, const std::string& rest, const std::string& ins, word line)
+word decode(byte op, byte cond, byte s, const std::string& rest, const std::string& ins, word line, std::map<std::string, word> & labels)
 {
   word ret;
   if(op <= 1)
@@ -130,7 +130,7 @@ word decode(byte op, byte cond, byte s, const std::string& rest, const std::stri
   else if(op == 11)
     ret = op_prnm(op, cond, s, rest, ins, line);
   else if(op == 12)
-    ret = op_brn(op, cond, s, rest, ins, line);
+    ret = op_brn(op, cond, s, rest, ins, line, labels);
   else if(op == OP_END)
     ret = MAX_U;
 
@@ -564,7 +564,7 @@ word op_addsub(byte op, byte cond, byte s, const std::string& rest, const std::s
 
 }
 
-word op_brn(byte op, byte cond, byte s, const std::string& rest, const std::string& ins, word line)
+word op_brn(byte op, byte cond, byte s, const std::string& rest, const std::string& ins, word line, std::map<std::string, word> & labels)
 {
   dword shift = 0;
   byte neg = 0;
@@ -584,28 +584,42 @@ word op_brn(byte op, byte cond, byte s, const std::string& rest, const std::stri
   if(arguments.size() != 1)
     error_handler(ERR_INA, line, ins.c_str());
 
-  //Set the negative bit to 1
-  if(arguments[0][0] == '#')
+  //If it is a label, we need to convert the label to a literal value.
+  if(arguments[0][0] == '.')
   {
-    arguments[0].erase(0, 1);
-  }
-  if(arguments[0][0] == '-')
-  {
-    neg = 1;
-    arguments[0].erase(0, 1);
-  }
+    LOG("Label in use");
+    std::map<std::string, word>::iterator it;
+    it = labels.find(arguments[0]);
+    if(it == labels.end())
+      error_handler(ERR_UKL, line, ins.c_str());
 
-  try
-  {
-    shift = stoll(arguments[0]);
+    //Compute the shift from the stored value in the label map
+    shift = labs((long int) line - (long int) it->second);
+    if(it->second < line)
+      neg = 1;
   }
-  catch(const std::invalid_argument & e)
+  else if(arguments[0][0] == '#')
   {
-    error_handler(ERR_URR, line, ins.c_str());
-  }
-  catch(const std::out_of_range & e)
-  {
-    error_handler(ERR_URR, line, ins.c_str());
+    arguments[0].erase(0, 1);
+
+    if(arguments[0][0] == '-')
+    {
+      neg = 1;
+      arguments[0].erase(0, 1);
+    }
+
+    try
+    {
+      shift = stoll(arguments[0]);
+    }
+    catch(const std::invalid_argument & e)
+    {
+      error_handler(ERR_URR, line, ins.c_str());
+    }
+    catch(const std::out_of_range & e)
+    {
+      error_handler(ERR_URR, line, ins.c_str());
+    }
   }
   if(shift > BRN_SHIFT_MAX)
     error_handler(ERR_URI, line, ins.c_str());

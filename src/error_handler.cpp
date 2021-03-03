@@ -66,5 +66,10 @@ void error_handler(word error_code, dword line, const char * str)
       FATALERROR("Unable to open file " << str << " for output");
       error_occurred = 1;
       break;
+    case ERR_UKL:
+      FATALERROR("Unknown label at line: " << line);
+      FATALERROR(str);
+      error_occurred = 1;
+      break;
   }
 }
