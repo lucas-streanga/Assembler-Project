@@ -50,6 +50,7 @@ extern bool error_occurred;
 #define OP_PRNR   10
 #define OP_PRNM   11
 #define OP_BRN    12
+#define OP_BRNL   13
 
 #define OP_END    255
 

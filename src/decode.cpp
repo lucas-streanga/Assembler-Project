@@ -130,7 +130,7 @@ word decode(file_info & info, byte op, byte cond, byte s, const std::string& res
     ret = op_prnr(info, op, cond, s, rest, ins, line);
   else if(op == 11)
     ret = op_prnm(info, op, cond, s, rest, ins, line);
-  else if(op == 12)
+  else if(op <= 13)
     ret = op_brn(info, op, cond, s, rest, ins, line, labels);
   else if(op == OP_END)
     ret = MAX_U;
@@ -712,8 +712,10 @@ byte str_to_op(file_info & info, const std::string & opcode, char s_flag, word l
     return OP_PRNR;
   else if(opcode == "prn" && s_flag == 'm')
     return OP_PRNM;
-  else if(opcode == "brn")
+  else if(opcode == "brn" && s_flag == 0)
     return OP_BRN;
+  else if(opcode == "brn" && s_flag == 'l')
+    return OP_BRNL;
   else if(opcode == "end")
     return OP_END;
   else
