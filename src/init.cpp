@@ -70,20 +70,30 @@ void format_string_literals(std::vector<std::string> & input)
   input.push_back("!");
 }
 
-void get_input(std::vector<std::string> & input)
+void get_input(file_info & info)
 {
-  while(std::cin)
+  LOG("***GETTING INPUT***");
+  std::vector<std::string> & input = *(info.input);
+  std::ifstream & file = *(info.input_file);
+  dword num_lines = 0;
+  while(file)
   {
     input.push_back("");
-    getline(std::cin, input[input.size() - 1]);
+    getline(file, input[input.size() - 1]);
+    num_lines++;
   }
+  info.set_lines(num_lines);
+  LOG("***GETTING INPUT DONE***");
 }
 
-void format(std::vector<std::string> & input)
+void format(file_info & info)
 {
   bool reached_data = false;
-  for(dword i = 0; i < input.size(); i++)
+  std::vector<std::string> & input = *(info.input);
+  dword real_line = 0;
+  for(dword i = 0; i < input.size(); i++, real_line++)
   {
+      info.real_lines[i] = real_line + 1;
       std::string & input_line = input[i];
       for(dword j = 0; j < input_line.size(); j++)
         if(input_line[j] == '@')
@@ -109,20 +119,20 @@ void format(std::vector<std::string> & input)
             for(dword k = 0; k < input_line.size(); k++)
               if(!std::isdigit(input_line[k]))
               {
-                error_handler(ERR_LNN, i+1, input_line.c_str());
+                error_handler(ERR_LNN, i, &info, NULL);
                 return;
               }
 
             dword w = std::stoll(input_line.c_str());
             if(w > MAX_U)
             {
-              error_handler(ERR_LTL, i+1, input_line.c_str());
+              error_handler(ERR_LTL, i, &info, NULL);
               return;
             }
           }
           catch(const std::out_of_range& e)
           {
-            error_handler(ERR_LTL, i+1, input_line.c_str());
+            error_handler(ERR_LTL, i, &info, NULL);
             return;
           }
         }
@@ -133,6 +143,10 @@ void format(std::vector<std::string> & input)
         i--;
       }
   }
+  LOG("\nMapping of virtual lines to real lines in file:");
+  for(dword i = 0; i < info.num_lines; i++)
+    LOG((unsigned int) i << " " << (unsigned int) info.real_lines[i]);
+
   return;
 }
 

@@ -10,6 +10,7 @@
 #include"asm_defines.h"
 #include"error_handler.h"
 #include"Virtual_memory.h"
+#include"file_info.h"
 #include<fstream>
 #include<map>
 
@@ -22,8 +23,8 @@ void format_string_literals(std::vector<std::string> &);
 
 void resolve_labels(std::vector<std::string> & input, std::map<std::string, word> & labels);
 
-void get_input(std::vector<std::string> &);
-void format(std::vector<std::string> &);
+void get_input(file_info &);
+void format(file_info &);
 dword get_size(std::vector<std::string> &);
 void print_all_memory(Virtual_memory &);
 

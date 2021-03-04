@@ -60,48 +60,68 @@ void operator delete[](void* ptr)
 }
 #endif
 
+
 int main(int argc, char ** argv)
 {
   TIMER("Whole Program");
 {
   error_occurred = 0;
+  char default_out_file [] = "a.out";
+
+  std::ofstream out_file;
+  std::ifstream in_file;
+
+  std::vector<std::string> * input = new std::vector<std::string>();
+  std::map<std::string, word> * labels = new std::map<std::string, word>();
+
+  file_info info(&in_file, input, labels);
+
   if(argc < 2)
-    error_handler(ERR_NFS, 0, NULL);
+    error_handler(ERR_NFS, 0, &info, NULL);
+  CHK_ERR;
+  if(argc < 3)
+  {
+    printf("No output file specified, default %s will be used.\n", default_out_file);
+    out_file.open(default_out_file, std::ios::out | std::ios::binary);
+  }
+  else
+  {
+    out_file.open(argv[2], std::ios::out | std::ios::binary);
+  }
+
+  in_file.open(argv[1]);
+
+
+  if(!out_file.is_open() || !in_file.is_open())
+    error_handler(ERR_UOF, 0, &info, argv[1]);
 
   CHK_ERR;
 
-  std::ofstream file(argv[1], std::ios::out | std::ios::binary);
-  if(!file.is_open())
-    error_handler(ERR_UOF, 0, argv[1]);
-
+  get_input(info);
   CHK_ERR;
-  std::vector<std::string> input;
-  std::map<std::string, word> labels;
-
-  get_input(input);
+  format(info);
   CHK_ERR;
-  format(input);
+  resolve_labels(*input, *labels);
   CHK_ERR;
-  resolve_labels(input, labels);
 
   //Debug log the labels.
-  LOG("labels:");
-  for(std::map<std::string, word>::iterator it = labels.begin(); it != labels.end(); it++)
+  LOG("\nLabel and Address Resolution:");
+  for(std::map<std::string, word>::iterator it = labels->begin(); it != labels->end(); it++)
   {
     LOG(it->first << " " << it->second);
   }
 
-  format_string_literals(input);
-
-  LOG("\n***Formatted Program***\n");
-  for(dword i = 0; i < input.size(); i++)
-    LOG(input[i]);
-
-  //Testing calculating number of words necessary...
-  dword size = get_size(input);
+  format_string_literals(*input);
   CHK_ERR;
 
-  LOG("Memory Required:\n" << size << " words\n" << size*4 << " bytes");
+  LOG("\n***Formatted Program***\n");
+  for(dword i = 0; i < input->size(); i++)
+    LOG((*input)[i]);
+  LOG("\n");
+
+  //Testing calculating number of words necessary...
+  dword size = get_size(*input);
+  CHK_ERR;
 
   //Terminator for the input...
 
@@ -109,23 +129,23 @@ int main(int argc, char ** argv)
   CHK_ERR;
 
   dword i = 0;
-  while(input[i] != ".data")
+  while((*(input))[i] != ".data")
   {
-    word ins = get_instruction(input[i], i+1, labels);
-    memcpy(mem.data + (i * 4), &ins, 4);
+    word ins = get_instruction(info, (*(input))[i], i+1, *labels);
     CHK_ERR;
+    memcpy(mem.data + (i * 4), &ins, 4);
     i++;
   }
   i++;
-  while(input[i] != "!")
+  while((*(input))[i] != "!")
   {
-    word data = get_data(input[i]);
+    word data = get_data((*(input))[i]);
     memcpy(mem.data + ((i - 1) * 4), &data, 4);
     i++;
   }
   print_all_memory(mem);
-  file.seekp(0);
-  file.write((const char *) mem.data, mem.size);
+  out_file.seekp(0);
+  out_file.write((const char *) mem.data, mem.size);
 }
   ALLOC_PRINT("*** Total objects allocated " << s_alloc_details.number_of_allocs);
   ALLOC_PRINT("*** Total objects freed " << s_alloc_details.number_of_frees);

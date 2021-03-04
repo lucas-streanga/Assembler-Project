@@ -56,7 +56,7 @@ word get_data(const std::string & s)
 
 }
 
-word get_instruction(const std::string & s, word line, std::map<std::string, word> & labels)
+word get_instruction(file_info & info, const std::string & s, word line, std::map<std::string, word> & labels)
 {
   //We need to do string parsing to get the instruction.
   //First, we need to find out if the delimiter is there
@@ -67,7 +67,8 @@ word get_instruction(const std::string & s, word line, std::map<std::string, wor
   std::string opcode;
 
   if(s.find(delim) == std::string::npos)
-    error_handler(ERR_FOP, line, s.c_str());
+    error_handler(ERR_FOP, line, &info, NULL);
+  CHK_ERR;
 
   const std::string & token = s.substr(0, s.find(delim));
   const std::string  & rest = s.substr(s.find(delim) + 1, s.size());
@@ -101,9 +102,9 @@ word get_instruction(const std::string & s, word line, std::map<std::string, wor
 
   byte op, cond, sbit;
 
-  op = str_to_op(opcode, s_flag, line);
+  op = str_to_op(info, opcode, s_flag, line);
   CHK_ERR;
-  cond = str_to_cond(conditional, line);
+  cond = str_to_cond(info, conditional, line);
   CHK_ERR;
   sbit = str_to_s(s_flag, line);
 
@@ -114,30 +115,30 @@ word get_instruction(const std::string & s, word line, std::map<std::string, wor
   LOG("Conditional " << conditional << " " << (int) cond);
   LOG("S set? " << (int) sbit);
 
-  word ret = decode(op, cond, sbit, rest, s, line, labels);
+  word ret = decode(info, op, cond, sbit, rest, s, line, labels);
   return ret;
 }
 
-word decode(byte op, byte cond, byte s, const std::string& rest, const std::string& ins, word line, std::map<std::string, word> & labels)
+word decode(file_info & info, byte op, byte cond, byte s, const std::string& rest, const std::string& ins, word line, std::map<std::string, word> & labels)
 {
   word ret;
   if(op <= 1)
-    ret = op_addsub(op, cond, s, rest, ins, line);
+    ret = op_addsub(info, op, cond, s, rest, ins, line);
   else if(op <= 9)
-    ret = op_ldrstr(op, cond, s, rest, ins, line);
+    ret = op_ldrstr(info, op, cond, s, rest, ins, line);
   else if(op == 10)
-    ret = op_prnr(op, cond, s, rest, ins, line);
+    ret = op_prnr(info, op, cond, s, rest, ins, line);
   else if(op == 11)
-    ret = op_prnm(op, cond, s, rest, ins, line);
+    ret = op_prnm(info, op, cond, s, rest, ins, line);
   else if(op == 12)
-    ret = op_brn(op, cond, s, rest, ins, line, labels);
+    ret = op_brn(info, op, cond, s, rest, ins, line, labels);
   else if(op == OP_END)
     ret = MAX_U;
 
   return ret;
 }
 
-word op_prnm(byte op, byte cond, byte s, const std::string& rest, const std::string& ins, word line)
+word op_prnm(file_info & info, byte op, byte cond, byte s, const std::string& rest, const std::string& ins, word line)
 {
   /* shift is 10 bits with 4 bit reg */
   /* or immed value of 14 bits */
@@ -158,7 +159,10 @@ word op_prnm(byte op, byte cond, byte s, const std::string& rest, const std::str
   for(word i = 0; i < arguments.size(); i++)
     LOG(arguments[i]);
   if(arguments.size() < 3 || arguments.size() > 4)
-    error_handler(ERR_INA, line, ins.c_str());
+    error_handler(ERR_INA, line, &info, NULL);
+
+  CHK_ERR;
+
   if(arguments[0][0] == '#')
     I = 1;
 
@@ -176,7 +180,8 @@ word op_prnm(byte op, byte cond, byte s, const std::string& rest, const std::str
   else if(spec == "char")
     specifier = 3;
   else
-    error_handler(ERR_INA, line, ins.c_str());
+    error_handler(ERR_INA, line, &info, NULL);
+  CHK_ERR;
 
   nbytes = arguments[arguments.size() - 2];
   if(nbytes == "byte")
@@ -188,7 +193,8 @@ word op_prnm(byte op, byte cond, byte s, const std::string& rest, const std::str
   else if(nbytes == "dword")
     num_bytes = 3;
   else
-    error_handler(ERR_INA, line, ins.c_str());
+    error_handler(ERR_INA, line, &info, NULL);
+  CHK_ERR;
 
   if(arguments.size() == 3 && I)
   {
@@ -198,14 +204,17 @@ word op_prnm(byte op, byte cond, byte s, const std::string& rest, const std::str
     }
     catch(const std::invalid_argument & e)
     {
-      error_handler(ERR_URR, line, ins.c_str());
+      error_handler(ERR_URR, line, &info, NULL);
+      CHK_ERR;
     }
     catch(const std::out_of_range & e)
     {
-      error_handler(ERR_URR, line, ins.c_str());
+      error_handler(ERR_URR, line, &info, NULL);
+      CHK_ERR;
     }
     if(immed > PRNM_IMMED_MAX)
-      error_handler(ERR_URI, line, ins.c_str());
+      error_handler(ERR_URI, line, &info, NULL);
+      CHK_ERR;
   }
   else if(arguments.size() == 3 && !I) //No immediate value, op2 is a reg
   {
@@ -215,14 +224,17 @@ word op_prnm(byte op, byte cond, byte s, const std::string& rest, const std::str
     }
     catch(const std::invalid_argument & e)
     {
-      error_handler(ERR_URR, line, ins.c_str());
+      error_handler(ERR_URR, line, &info, NULL);
+      CHK_ERR;
     }
     catch(const std::out_of_range & e)
     {
-      error_handler(ERR_URR, line, ins.c_str());
+      error_handler(ERR_URR, line, &info, NULL);
+      CHK_ERR;
     }
     if(Rn > 15)
-      error_handler(ERR_URR, line, ins.c_str());
+      error_handler(ERR_URR, line, &info, NULL);
+      CHK_ERR;
   }
   else  //Shift, Rd, Rn, and Op2 are regs and last is shift
   {
@@ -233,16 +245,20 @@ word op_prnm(byte op, byte cond, byte s, const std::string& rest, const std::str
     }
     catch(const std::invalid_argument & e)
     {
-      error_handler(ERR_URR, line, ins.c_str());
+      error_handler(ERR_URR, line, &info, NULL);
+      CHK_ERR;
     }
     catch(const std::out_of_range & e)
     {
-      error_handler(ERR_URR, line, ins.c_str());
+      error_handler(ERR_URR, line, &info, NULL);
+      CHK_ERR;
     }
     if(Rn > 15)
-      error_handler(ERR_URR, line, ins.c_str());
+      error_handler(ERR_URR, line, &info, NULL);
+    CHK_ERR;
     if(shift > PRNM_SHIFT_MAX)
-      error_handler(ERR_URI, line, ins.c_str());
+      error_handler(ERR_URI, line, &info, NULL);
+    CHK_ERR;
   }
 
   LOG("Instruction Decoded:");
@@ -264,7 +280,7 @@ word op_prnm(byte op, byte cond, byte s, const std::string& rest, const std::str
 
 }
 
-word op_prnr(byte op, byte cond, byte s, const std::string& rest, const std::string& ins, word line)
+word op_prnr(file_info & info, byte op, byte cond, byte s, const std::string& rest, const std::string& ins, word line)
 {
   dword num_registers, specifier;
   word R[4] = {0};
@@ -283,7 +299,8 @@ word op_prnr(byte op, byte cond, byte s, const std::string& rest, const std::str
   for(word i = 0; i < arguments.size(); i++)
     LOG(arguments[i]);
   if(arguments.size() < 2 || arguments.size() > 5)
-    error_handler(ERR_INA, line, ins.c_str());
+    error_handler(ERR_INA, line, &info, NULL);
+  CHK_ERR;
 
   num_registers = arguments.size() - 1;
   spec = arguments[arguments.size() - 1];
@@ -296,7 +313,8 @@ word op_prnr(byte op, byte cond, byte s, const std::string& rest, const std::str
   else if(spec == "char")
     specifier = 3;
   else
-    error_handler(ERR_INA, line, ins.c_str());
+    error_handler(ERR_INA, line, &info, NULL);
+  CHK_ERR;
 
   for(word i = 0; i < arguments.size(); i++)
     if(arguments[i][0] == 'r')
@@ -310,14 +328,17 @@ word op_prnr(byte op, byte cond, byte s, const std::string& rest, const std::str
     }
     catch(const std::invalid_argument & e)
     {
-      error_handler(ERR_URR, line, ins.c_str());
+      error_handler(ERR_URR, line, &info, NULL);
+      CHK_ERR;
     }
     catch(const std::out_of_range & e)
     {
-      error_handler(ERR_URR, line, ins.c_str());
+      error_handler(ERR_URR, line, &info, NULL);
+      CHK_ERR;
     }
     if(Rn > 15)
-      error_handler(ERR_URR, line, ins.c_str());
+      error_handler(ERR_URR, line, &info, NULL);
+    CHK_ERR;
 
     R[i] = Rn;
   }
@@ -338,7 +359,7 @@ word op_prnr(byte op, byte cond, byte s, const std::string& rest, const std::str
 
 }
 
-word op_ldrstr(byte op, byte cond, byte s, const std::string& rest, const std::string& ins, word line)
+word op_ldrstr(file_info & info, byte op, byte cond, byte s, const std::string& rest, const std::string& ins, word line)
 {
   dword Rd, Rn, immed, shift = 0;
   byte I = 0;
@@ -356,7 +377,8 @@ word op_ldrstr(byte op, byte cond, byte s, const std::string& rest, const std::s
   for(word i = 0; i < arguments.size(); i++)
     LOG(arguments[i]);
   if(arguments.size() < 2 || arguments.size() > 3)
-    error_handler(ERR_INA, line, ins.c_str());
+    error_handler(ERR_INA, line, &info, NULL);
+  CHK_ERR;
   if(arguments[1][0] == '#')
     I = 1;
 
@@ -365,7 +387,8 @@ word op_ldrstr(byte op, byte cond, byte s, const std::string& rest, const std::s
     if(arguments[i][0] == 'r' || arguments[i][0] == '#')
       arguments[i].erase(0, 1);
     else
-      error_handler(ERR_URI, line, ins.c_str());
+      error_handler(ERR_URI, line, &info, NULL);
+    CHK_ERR;
   }
 
   if(arguments.size() == 2 && I)
@@ -377,16 +400,20 @@ word op_ldrstr(byte op, byte cond, byte s, const std::string& rest, const std::s
     }
     catch(const std::invalid_argument & e)
     {
-      error_handler(ERR_URR, line, ins.c_str());
+      error_handler(ERR_URR, line, &info, NULL);
+      CHK_ERR;
     }
     catch(const std::out_of_range & e)
     {
-      error_handler(ERR_URR, line, ins.c_str());
+      error_handler(ERR_URR, line, &info, NULL);
+      CHK_ERR;
     }
     if(Rd > 15)
-      error_handler(ERR_URR, line, ins.c_str());
+      error_handler(ERR_URR, line, &info, NULL);
+    CHK_ERR;
     if(immed > LS_IMMED_MAX)
-      error_handler(ERR_URI, line, ins.c_str());
+      error_handler(ERR_URI, line, &info, NULL);
+    CHK_ERR;
   }
   else if(arguments.size() == 2 && !I) //No immediate value, op2 is a reg
   {
@@ -397,14 +424,17 @@ word op_ldrstr(byte op, byte cond, byte s, const std::string& rest, const std::s
     }
     catch(const std::invalid_argument & e)
     {
-      error_handler(ERR_URR, line, ins.c_str());
+      error_handler(ERR_URR, line, &info, NULL);
+      CHK_ERR;
     }
     catch(const std::out_of_range & e)
     {
-      error_handler(ERR_URR, line, ins.c_str());
+      error_handler(ERR_URR, line, &info, NULL);
+      CHK_ERR;
     }
     if(Rd > 15 || Rn > 15)
-      error_handler(ERR_URR, line, ins.c_str());
+      error_handler(ERR_URR, line, &info, NULL);
+    CHK_ERR;
   }
   else  //Shift, Rd, Rn, and Op2 are regs and last is shift
   {
@@ -416,16 +446,20 @@ word op_ldrstr(byte op, byte cond, byte s, const std::string& rest, const std::s
     }
     catch(const std::invalid_argument & e)
     {
-      error_handler(ERR_URR, line, ins.c_str());
+      error_handler(ERR_URR, line, &info, NULL);
+      CHK_ERR;
     }
     catch(const std::out_of_range & e)
     {
-      error_handler(ERR_URR, line, ins.c_str());
+      error_handler(ERR_URR, line, &info, NULL);
+      CHK_ERR;
     }
     if(Rd > 15 || Rn > 15)
-      error_handler(ERR_URR, line, ins.c_str());
+      error_handler(ERR_URR, line, &info, NULL);
+    CHK_ERR;
     if(shift > LS_SHIFT_MAX)
-      error_handler(ERR_URI, line, ins.c_str());
+      error_handler(ERR_URI, line, &info, NULL);
+    CHK_ERR;
   }
 
   LOG("Instruction Decoded:");
@@ -448,7 +482,7 @@ word op_ldrstr(byte op, byte cond, byte s, const std::string& rest, const std::s
   return ret;
 }
 
-word op_addsub(byte op, byte cond, byte s, const std::string& rest, const std::string& ins, word line)
+word op_addsub(file_info & info, byte op, byte cond, byte s, const std::string& rest, const std::string& ins, word line)
 {
   dword Rd, Rn, op2, shift = 0;
   byte I = 0;
@@ -466,7 +500,8 @@ word op_addsub(byte op, byte cond, byte s, const std::string& rest, const std::s
     LOG(arguments[i]);
 
   if(arguments.size() < 3 || arguments.size() > 4)
-    error_handler(ERR_INA, line, ins.c_str());
+    error_handler(ERR_INA, line, &info, NULL);
+  CHK_ERR;
   if(arguments[2][0] == '#')
     I = 1;
 
@@ -475,7 +510,8 @@ word op_addsub(byte op, byte cond, byte s, const std::string& rest, const std::s
     if(arguments[i][0] == 'r' || arguments[i][0] == '#')
       arguments[i].erase(0, 1);
     else
-      error_handler(ERR_URI, line, ins.c_str());
+      error_handler(ERR_URI, line, &info, NULL);
+    CHK_ERR;
   }
 
   //Three args, third one being immediate value
@@ -489,16 +525,20 @@ word op_addsub(byte op, byte cond, byte s, const std::string& rest, const std::s
     }
     catch(const std::invalid_argument & e)
     {
-      error_handler(ERR_URR, line, ins.c_str());
+      error_handler(ERR_URR, line, &info, NULL);
+      CHK_ERR;
     }
     catch(const std::out_of_range & e)
     {
-      error_handler(ERR_URR, line, ins.c_str());
+      error_handler(ERR_URR, line, &info, NULL);
+      CHK_ERR;
     }
     if(Rd > 15 || Rn > 15)
-      error_handler(ERR_URR, line, ins.c_str());
+      error_handler(ERR_URR, line, &info, NULL);
+    CHK_ERR;
     if(op2 > AS_IMMED_MAX)
-      error_handler(ERR_URI, line, ins.c_str());
+      error_handler(ERR_URI, line, &info, NULL);
+    CHK_ERR;
   }
   else if(arguments.size() == 3 && !I) //No immediate value, op2 is a reg
   {
@@ -510,14 +550,17 @@ word op_addsub(byte op, byte cond, byte s, const std::string& rest, const std::s
     }
     catch(const std::invalid_argument & e)
     {
-      error_handler(ERR_URR, line, ins.c_str());
+      error_handler(ERR_URR, line, &info, NULL);
+      CHK_ERR;
     }
     catch(const std::out_of_range & e)
     {
-      error_handler(ERR_URR, line, ins.c_str());
+      error_handler(ERR_URR, line, &info, NULL);
+      CHK_ERR;
     }
     if(Rd > 15 || Rn > 15 || op2 > 15)
-      error_handler(ERR_URR, line, ins.c_str());
+      error_handler(ERR_URR, line, &info, NULL);
+    CHK_ERR;
   }
   else  //Shift, Rd, Rn, and Op2 are regs and last is shift
   {
@@ -530,16 +573,20 @@ word op_addsub(byte op, byte cond, byte s, const std::string& rest, const std::s
     }
     catch(const std::invalid_argument & e)
     {
-      error_handler(ERR_URR, line, ins.c_str());
+      error_handler(ERR_URR, line, &info, NULL);
+      CHK_ERR;
     }
     catch(const std::out_of_range & e)
     {
-      error_handler(ERR_URR, line, ins.c_str());
+      error_handler(ERR_URR, line, &info, NULL);
+      CHK_ERR;
     }
     if(Rd > 15 || Rn > 15 || op2 > 15)
-      error_handler(ERR_URR, line, ins.c_str());
+      error_handler(ERR_URR, line, &info, NULL);
+    CHK_ERR;
     if(shift > AS_SHIFT_MAX)
-      error_handler(ERR_URI, line, ins.c_str());
+      error_handler(ERR_URI, line, &info, NULL);
+    CHK_ERR;
   }
 
   LOG("Instruction Decoded:");
@@ -564,7 +611,7 @@ word op_addsub(byte op, byte cond, byte s, const std::string& rest, const std::s
 
 }
 
-word op_brn(byte op, byte cond, byte s, const std::string& rest, const std::string& ins, word line, std::map<std::string, word> & labels)
+word op_brn(file_info & info, byte op, byte cond, byte s, const std::string& rest, const std::string& ins, word line, std::map<std::string, word> & labels)
 {
   dword shift = 0;
   byte neg = 0;
@@ -582,7 +629,8 @@ word op_brn(byte op, byte cond, byte s, const std::string& rest, const std::stri
     LOG(arguments[i]);
 
   if(arguments.size() != 1)
-    error_handler(ERR_INA, line, ins.c_str());
+    error_handler(ERR_INA, line, &info, NULL);
+  CHK_ERR;
 
   //If it is a label, we need to convert the label to a literal value.
   if(arguments[0][0] == '.')
@@ -591,7 +639,8 @@ word op_brn(byte op, byte cond, byte s, const std::string& rest, const std::stri
     std::map<std::string, word>::iterator it;
     it = labels.find(arguments[0]);
     if(it == labels.end())
-      error_handler(ERR_UKL, line, ins.c_str());
+      error_handler(ERR_UKL, line, &info, NULL);
+    CHK_ERR;
 
     //Compute the shift from the stored value in the label map
     shift = labs((long int) line - (long int) it->second);
@@ -614,15 +663,18 @@ word op_brn(byte op, byte cond, byte s, const std::string& rest, const std::stri
     }
     catch(const std::invalid_argument & e)
     {
-      error_handler(ERR_URR, line, ins.c_str());
+      error_handler(ERR_URR, line, &info, NULL);
+      CHK_ERR;
     }
     catch(const std::out_of_range & e)
     {
-      error_handler(ERR_URR, line, ins.c_str());
+      error_handler(ERR_URR, line, &info, NULL);
+      CHK_ERR;
     }
   }
   if(shift > BRN_SHIFT_MAX)
-    error_handler(ERR_URI, line, ins.c_str());
+    error_handler(ERR_URI, line, &info, NULL);
+  CHK_ERR;
 
   LOG("Instruction Decoded:");
   LOG("Negative? " << (int) neg);
@@ -634,7 +686,7 @@ word op_brn(byte op, byte cond, byte s, const std::string& rest, const std::stri
   return ret;
 }
 
-byte str_to_op(const std::string & opcode, char s_flag, word line)
+byte str_to_op(file_info & info, const std::string & opcode, char s_flag, word line)
 {
   if(opcode == "add")
     return OP_ADD;
@@ -665,12 +717,13 @@ byte str_to_op(const std::string & opcode, char s_flag, word line)
   else if(opcode == "end")
     return OP_END;
   else
-    error_handler(ERR_UOC, line, opcode.c_str());
+    error_handler(ERR_UOC, line, &info, NULL);
+  CHK_ERR;
 
   return 0;
 }
 
-byte str_to_cond(const std::string & cond, word line)
+byte str_to_cond(file_info & info, const std::string & cond, word line)
 {
   if(cond == "al")
     return COND_AL;
@@ -705,7 +758,8 @@ byte str_to_cond(const std::string & cond, word line)
   else if(cond == "nv")
     return COND_NV;
   else
-    error_handler(ERR_UCO, line, cond.c_str());
+    error_handler(ERR_UCO, line, &info, NULL);
+  CHK_ERR;
 
   return 0;
 }
