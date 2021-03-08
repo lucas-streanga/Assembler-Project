@@ -2,8 +2,6 @@
 
 file_info::~file_info()
 {
-  delete input;
-  delete labels;
   if(real_lines != NULL)
     free(real_lines);
 }

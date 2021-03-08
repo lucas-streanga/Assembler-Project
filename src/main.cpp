@@ -71,10 +71,10 @@ int main(int argc, char ** argv)
   std::ofstream out_file;
   std::ifstream in_file;
 
-  std::vector<std::string> * input = new std::vector<std::string>();
-  std::map<std::string, word> * labels = new std::map<std::string, word>();
+  std::vector<std::string>  input;
+  std::map<std::string, word>  labels;
 
-  file_info info(&in_file, input, labels);
+  file_info info(&in_file, &input, &labels);
 
   if(argc < 2)
     error_handler(ERR_NFS, 0, &info, NULL);
@@ -101,26 +101,26 @@ int main(int argc, char ** argv)
   CHK_ERR;
   format(info);
   CHK_ERR;
-  resolve_labels(*input, *labels);
+  resolve_labels(input, labels);
   CHK_ERR;
 
   //Debug log the labels.
   LOG("\nLabel and Address Resolution:");
-  for(std::map<std::string, word>::iterator it = labels->begin(); it != labels->end(); it++)
+  for(std::map<std::string, word>::iterator it = labels.begin(); it != labels.end(); it++)
   {
     LOG(it->first << " " << it->second);
   }
 
-  format_string_literals(*input);
+  format_string_literals(input);
   CHK_ERR;
 
   LOG("\n***Formatted Program***\n");
-  for(dword i = 0; i < input->size(); i++)
-    LOG((*input)[i]);
+  for(dword i = 0; i < input.size(); i++)
+    LOG(input[i]);
   LOG("\n");
 
   //Testing calculating number of words necessary...
-  dword size = get_size(*input);
+  dword size = get_size(input);
   CHK_ERR;
 
   //Terminator for the input...
@@ -129,17 +129,17 @@ int main(int argc, char ** argv)
   CHK_ERR;
 
   dword i = 0;
-  while((*(input))[i] != ".data")
+  while(input[i] != ".data")
   {
-    word ins = get_instruction(info, (*(input))[i], i+1, *labels);
+    word ins = get_instruction(info, input[i], i+1, labels);
     CHK_ERR;
     memcpy(mem.data + (i * 4), &ins, 4);
     i++;
   }
   i++;
-  while((*(input))[i] != "!")
+  while(input[i] != "!")
   {
-    word data = get_data((*(input))[i]);
+    word data = get_data(input[i]);
     memcpy(mem.data + ((i - 1) * 4), &data, 4);
     i++;
   }
