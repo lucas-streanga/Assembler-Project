@@ -13,6 +13,8 @@ OBJ6 = $(SRC6:.cpp=.o)
 
 EXE = Assembler
 
+INSTALL_PATH = /usr/local/bin
+
 HFILES = include/asm_defines.h include/error_handler.h include/init.h include/decode.h include/file_info.h
 CFLAGS = -O2
 LDFLAGS =
@@ -56,9 +58,21 @@ $(OBJ5) : $(SRC5) $(HFILES)
 $(OBJ6) : $(SRC6) $(HFILES)
 	g++ $(INCDIR) -c $(CFLAGS) $(TCOMP) $(SHOW_ALLOCCOMP) $(SRC6) -o $(OBJ6)
 
-debug: CFLAGS = -g -Wall -Wextra -DDEBUG=1
+debug: CFLAGS = -g -Wall -DDEBUG=1
 debug: all
 
 cleanup:
 	@echo "Deleting object files..."
 	rm -f src/*.o
+
+clean:
+	make -B
+	make cleanup
+
+clean-debug:
+	make debug -B
+	make cleanup
+
+install : $(EXE)
+	@echo "Installing executable to path" $(INSTALL_PATH)
+	cp $(EXE) $(INSTALL_PATH)/$(EXE)
