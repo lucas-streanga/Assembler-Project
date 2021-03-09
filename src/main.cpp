@@ -154,6 +154,7 @@ int main(int argc, char ** argv)
 }
   ALLOC_PRINT("*** Total objects allocated " << s_alloc_details.number_of_allocs);
   ALLOC_PRINT("*** Total objects freed " << s_alloc_details.number_of_frees);
+  ALLOC_PRINT("*** Total bytes allocated " << s_alloc_details.total_bytes_allocated);
 
   return 0;
 }
