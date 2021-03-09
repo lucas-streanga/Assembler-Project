@@ -66,7 +66,6 @@ int main(int argc, char ** argv)
   TIMER("Whole Program");
 {
   error_occurred = 0;
-  char default_out_file [] = "a.out";
 
   std::ofstream out_file;
   std::ifstream in_file;
@@ -81,8 +80,8 @@ int main(int argc, char ** argv)
   CHK_ERR;
   if(argc < 3)
   {
-    printf("No output file specified, default %s will be used.\n", default_out_file);
-    out_file.open(default_out_file, std::ios::out | std::ios::binary);
+    printf("No output file specified, default %s will be used.\n", DEFAULT_OUT_FILE);
+    out_file.open(DEFAULT_OUT_FILE, std::ios::out | std::ios::binary);
   }
   else
   {
@@ -134,14 +133,15 @@ int main(int argc, char ** argv)
   CHK_ERR;
 
   dword i = 0;
-  while(input[i] != ".data")
+  while(input[i] != ".data" && input[i] != "!")
   {
     word ins = get_instruction(info, input[i], i+1, labels);
     CHK_ERR;
     memcpy(mem.data + (i * 4), &ins, 4);
     i++;
   }
-  i++;
+  if(input[i] != "!")
+    i++;
   while(input[i] != "!")
   {
     word data = get_data(input[i]);

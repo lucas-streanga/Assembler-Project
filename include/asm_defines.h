@@ -36,6 +36,10 @@
 extern bool error_occurred;
 #define CHK_ERR if(error_occurred){return 0;}
 
+//Default out file
+#define DEFAULT_OUT_FILE "a.out"
+
+
 /* Opcodes */
 #define OP_ADD    0
 #define OP_SUB    1
