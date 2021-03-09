@@ -12,7 +12,7 @@ word get_data(const std::string &);
 
 byte str_to_op(file_info &, const std::string &, char s_flag, word line);
 byte str_to_cond(file_info &, const std::string &, word line);
-byte str_to_s(char, word line);
+byte str_to_s(char);
 
 word decode(file_info &, byte op, byte cond, byte s, const std::string &, const std::string &, word, std::map<std::string, word> & );
 

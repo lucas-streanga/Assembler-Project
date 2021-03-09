@@ -41,6 +41,16 @@ void inline STRING_RM_WHITESPACE(std::string& s)
   s = temp;
 }
 
+dword reserve_line_count(std::ifstream & file)
+{
+  file.unsetf(std::ios_base::skipws);
+  dword line_count = std::count(std::istream_iterator<char>(file), std::istream_iterator<char>(), '\n');
+  LOG(line_count);
+  file.clear();
+  file.seekg(0);
+  return line_count;
+}
+
 void format_string_literals(std::vector<std::string> & input)
 {
   for(dword i = 0; i < input.size(); i++)
@@ -75,14 +85,33 @@ void get_input(file_info & info)
   LOG("***GETTING INPUT***");
   std::vector<std::string> & input = *(info.input);
   std::ifstream & file = *(info.input_file);
-  dword num_lines = 0;
-  while(file)
+
+  std::string input_line;
+  dword real_line = 0;
+  dword i = 0;
+  while(getline(file, input_line))
   {
-    input.push_back("");
-    getline(file, input[input.size() - 1]);
-    num_lines++;
+    info.real_lines[i] = real_line + 1;
+
+    for(dword j = 0; j < input_line.size(); j++)
+      if(input_line[j] == '@')
+        input_line.erase(input_line.begin() + j, input_line.end());
+
+    STRING_RM_WHITESPACE(input_line);
+    STRING_TO_LOWER(input_line);
+
+    if(!input_line.empty())
+    {
+      i++;
+      real_line++;
+      input.push_back(input_line);
+    }
+    else
+    {
+      real_line++;
+    }
   }
-  info.set_lines(num_lines);
+
   LOG("***GETTING INPUT DONE***");
 }
 
@@ -90,17 +119,10 @@ void format(file_info & info)
 {
   bool reached_data = false;
   std::vector<std::string> & input = *(info.input);
-  dword real_line = 0;
-  for(dword i = 0; i < input.size(); i++, real_line++)
-  {
-      info.real_lines[i] = real_line + 1;
-      std::string & input_line = input[i];
-      for(dword j = 0; j < input_line.size(); j++)
-        if(input_line[j] == '@')
-          input_line.erase(input_line.begin() + j, input_line.end());
 
-      STRING_RM_WHITESPACE(input_line);
-      STRING_TO_LOWER(input_line);
+  for(dword i = 0; i < input.size(); i++)
+  {
+      std::string & input_line = input[i];
 
       if(input_line == ".data")
       {
@@ -137,11 +159,6 @@ void format(file_info & info)
           }
         }
 
-      if(input_line.empty())
-      {
-        input.erase(input.begin() + i);
-        i--;
-      }
   }
   LOG("\nMapping of virtual lines to real lines in file:");
   for(dword i = 0; i < info.num_lines; i++)

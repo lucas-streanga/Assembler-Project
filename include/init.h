@@ -13,11 +13,14 @@
 #include"file_info.h"
 #include<fstream>
 #include<map>
+#include<iterator>
+#include<algorithm>
 
 /* Prototypes */
 
 void inline STRING_TO_LOWER(std::string &);
 void inline STRING_RM_WHITESPACE(std::string &);
+dword reserve_line_count(std::ifstream & file);
 
 void format_string_literals(std::vector<std::string> &);
 

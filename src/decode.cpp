@@ -106,7 +106,7 @@ word get_instruction(file_info & info, const std::string & s, word line, std::ma
   CHK_ERR;
   cond = str_to_cond(info, conditional, line);
   CHK_ERR;
-  sbit = str_to_s(s_flag, line);
+  sbit = str_to_s(s_flag);
 
   if(op == OP_CMP)
     sbit = 1;
@@ -142,23 +142,30 @@ word op_prnm(file_info & info, byte op, byte cond, byte s, const std::string& re
 {
   /* shift is 10 bits with 4 bit reg */
   /* or immed value of 14 bits */
+
+  //We need to use reserve smartly to avoid extra heap alloc
   dword Rn, specifier = 0, num_bytes = 0, shift = 0, immed = 0;
   std::string spec;
   std::string nbytes;
   byte I = 0;
   std::stringstream ss(rest);
-  std::vector<std::string> arguments;
+  std::string arguments[4];
+  byte num_args = 0;
+
   //We need to break this up with delimiting commas
-  while(ss.good())
+  while(ss.good() && num_args <= 4)
   {
     std::string str;
     getline(ss, str, ',');
     if(!str.empty())
-      arguments.push_back(str);
+    {
+      arguments[num_args] = str;
+      num_args++;
+    }
   }
-  for(word i = 0; i < arguments.size(); i++)
+  for(byte i = 0; i < num_args; i++)
     LOG(arguments[i]);
-  if(arguments.size() < 3 || arguments.size() > 4)
+  if(num_args < 3 || num_args > 4)
     error_handler(ERR_INA, line, &info, NULL);
 
   CHK_ERR;
@@ -166,11 +173,11 @@ word op_prnm(file_info & info, byte op, byte cond, byte s, const std::string& re
   if(arguments[0][0] == '#')
     I = 1;
 
-  for(word i = 0; i < arguments.size(); i++)
+  for(byte i = 0; i < num_args; i++)
     if(arguments[i][0] == 'r' || arguments[i][0] == '#')
       arguments[i].erase(0, 1);
 
-  spec = arguments[arguments.size() - 1];
+  spec = arguments[num_args - 1];
   if(spec == "uint")
     specifier = 0;
   else if(spec == "int")
@@ -183,7 +190,7 @@ word op_prnm(file_info & info, byte op, byte cond, byte s, const std::string& re
     error_handler(ERR_INA, line, &info, NULL);
   CHK_ERR;
 
-  nbytes = arguments[arguments.size() - 2];
+  nbytes = arguments[num_args - 2];
   if(nbytes == "byte")
     num_bytes = 0;
   else if(nbytes == "half")
@@ -196,7 +203,7 @@ word op_prnm(file_info & info, byte op, byte cond, byte s, const std::string& re
     error_handler(ERR_INA, line, &info, NULL);
   CHK_ERR;
 
-  if(arguments.size() == 3 && I)
+  if(num_args == 3 && I)
   {
     try
     {
@@ -216,7 +223,7 @@ word op_prnm(file_info & info, byte op, byte cond, byte s, const std::string& re
       error_handler(ERR_URI, line, &info, NULL);
       CHK_ERR;
   }
-  else if(arguments.size() == 3 && !I) //No immediate value, op2 is a reg
+  else if(num_args == 3 && !I) //No immediate value, op2 is a reg
   {
     try
     {
@@ -287,23 +294,28 @@ word op_prnr(file_info & info, byte op, byte cond, byte s, const std::string& re
   dword Rn;
   std::string spec;
   std::stringstream ss(rest);
-  std::vector<std::string> arguments;
+  std::string arguments[5];
+  byte num_args = 0;
+
   //We need to break this up with delimiting commas
-  while(ss.good())
+  while(ss.good() && num_args <= 5)
   {
     std::string str;
     getline(ss, str, ',');
     if(!str.empty())
-      arguments.push_back(str);
+    {
+      arguments[num_args] = str;
+      num_args++;
+    }
   }
-  for(word i = 0; i < arguments.size(); i++)
+  for(byte i = 0; i < num_args; i++)
     LOG(arguments[i]);
-  if(arguments.size() < 2 || arguments.size() > 5)
+  if(num_args < 2 || num_args > 5)
     error_handler(ERR_INA, line, &info, NULL);
   CHK_ERR;
 
-  num_registers = arguments.size() - 1;
-  spec = arguments[arguments.size() - 1];
+  num_registers = num_args - 1;
+  spec = arguments[num_args - 1];
   if(spec == "uint")
     specifier = 0;
   else if(spec == "int")
@@ -316,11 +328,11 @@ word op_prnr(file_info & info, byte op, byte cond, byte s, const std::string& re
     error_handler(ERR_INA, line, &info, NULL);
   CHK_ERR;
 
-  for(word i = 0; i < arguments.size(); i++)
+  for(byte i = 0; i < num_args; i++)
     if(arguments[i][0] == 'r')
       arguments[i].erase(0, 1);
 
-  for(word i = 0; i < arguments.size() - 1; i++)
+  for(byte i = 0; i < num_args - 1; i++)
   {
     try
     {
@@ -365,24 +377,29 @@ word op_ldrstr(file_info & info, byte op, byte cond, byte s, const std::string& 
   byte I = 0;
 
   std::stringstream ss(rest);
-  std::vector<std::string> arguments;
+  std::string arguments[3];
+  byte num_args = 0;
+
   //We need to break this up with delimiting commas
-  while(ss.good())
+  while(ss.good() && num_args <= 3)
   {
     std::string str;
     getline(ss, str, ',');
     if(!str.empty())
-      arguments.push_back(str);
+    {
+      arguments[num_args] = str;
+      num_args++;
+    }
   }
-  for(word i = 0; i < arguments.size(); i++)
+  for(byte i = 0; i < num_args; i++)
     LOG(arguments[i]);
-  if(arguments.size() < 2 || arguments.size() > 3)
+  if(num_args < 2 || num_args > 3)
     error_handler(ERR_INA, line, &info, NULL);
   CHK_ERR;
   if(arguments[1][0] == '#')
     I = 1;
 
-  for(word i = 0; i < arguments.size(); i++)
+  for(byte i = 0; i < num_args; i++)
   {
     if(arguments[i][0] == 'r' || arguments[i][0] == '#')
       arguments[i].erase(0, 1);
@@ -391,7 +408,7 @@ word op_ldrstr(file_info & info, byte op, byte cond, byte s, const std::string& 
     CHK_ERR;
   }
 
-  if(arguments.size() == 2 && I)
+  if(num_args == 2 && I)
   {
     try
     {
@@ -415,7 +432,7 @@ word op_ldrstr(file_info & info, byte op, byte cond, byte s, const std::string& 
       error_handler(ERR_URI, line, &info, NULL);
     CHK_ERR;
   }
-  else if(arguments.size() == 2 && !I) //No immediate value, op2 is a reg
+  else if(num_args == 2 && !I) //No immediate value, op2 is a reg
   {
     try
     {
@@ -487,25 +504,29 @@ word op_addsub(file_info & info, byte op, byte cond, byte s, const std::string& 
   dword Rd, Rn, op2, shift = 0;
   byte I = 0;
   std::stringstream ss(rest);
-  std::vector<std::string> arguments;
+  std::string arguments[4];
+  byte num_args = 0;
   //We need to break this up with delimiting commas
-  while(ss.good())
+  while(ss.good() && num_args <= 4)
   {
     std::string str;
     getline(ss, str, ',');
     if(!str.empty())
-      arguments.push_back(str);
+    {
+      arguments[num_args] = str;
+      num_args++;
+    }
   }
-  for(word i = 0; i < arguments.size(); i++)
+  for(byte i = 0; i < num_args; i++)
     LOG(arguments[i]);
 
-  if(arguments.size() < 3 || arguments.size() > 4)
+  if(num_args < 3 || num_args > 4)
     error_handler(ERR_INA, line, &info, NULL);
   CHK_ERR;
   if(arguments[2][0] == '#')
     I = 1;
 
-  for(word i = 0; i < arguments.size(); i++)
+  for(byte i = 0; i < num_args; i++)
   {
     if(arguments[i][0] == 'r' || arguments[i][0] == '#')
       arguments[i].erase(0, 1);
@@ -515,7 +536,7 @@ word op_addsub(file_info & info, byte op, byte cond, byte s, const std::string& 
   }
 
   //Three args, third one being immediate value
-  if(arguments.size() == 3 && I)
+  if(num_args == 3 && I)
   {
     try
     {
@@ -540,7 +561,7 @@ word op_addsub(file_info & info, byte op, byte cond, byte s, const std::string& 
       error_handler(ERR_URI, line, &info, NULL);
     CHK_ERR;
   }
-  else if(arguments.size() == 3 && !I) //No immediate value, op2 is a reg
+  else if(num_args == 3 && !I) //No immediate value, op2 is a reg
   {
     try
     {
@@ -616,19 +637,24 @@ word op_brn(file_info & info, byte op, byte cond, byte s, const std::string& res
   dword shift = 0;
   byte neg = 0;
   std::stringstream ss(rest);
-  std::vector<std::string> arguments;
+  std::string arguments[1];
+  byte num_args = 0;
+
   //We need to break this up with delimiting commas
-  while(ss.good())
+  while(ss.good() && num_args <= 1)
   {
     std::string str;
     getline(ss, str, ',');
     if(!str.empty())
-      arguments.push_back(str);
+    {
+      arguments[num_args] = str;
+      num_args++;
+    }
   }
-  for(word i = 0; i < arguments.size(); i++)
+  for(byte i = 0; i < num_args; i++)
     LOG(arguments[i]);
 
-  if(arguments.size() != 1)
+  if(num_args != 1)
     error_handler(ERR_INA, line, &info, NULL);
   CHK_ERR;
 
@@ -766,7 +792,7 @@ byte str_to_cond(file_info & info, const std::string & cond, word line)
   return 0;
 }
 
-byte str_to_s(char s, word line)
+byte str_to_s(char s)
 {
   if(s == 's')
     return 1;

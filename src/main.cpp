@@ -97,6 +97,11 @@ int main(int argc, char ** argv)
 
   CHK_ERR;
 
+  //We will use vector reserve semantics to reduce the number of reallocs
+  dword num_lines = reserve_line_count(in_file);
+  info.set_lines(num_lines);
+  input.reserve(num_lines);
+
   get_input(info);
   CHK_ERR;
   format(info);
