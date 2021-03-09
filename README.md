@@ -4,8 +4,8 @@ Please also see [Virtual Processor](https://github.com/lucas-streanga/Processor-
 
 # How it works
 This assembler allows the user to write assembly language and will assemble it into binary machine code for use with the virtual processor.
-Currently, all instructions are supported, as well as conditionals, flags, and data in memory. Labels are not yet implemented, but branching
-can be done by editing the PC.
+Currently, all instructions are supported, as well as conditionals, flags, and data in memory. Labels are now implemented and branching can be down with
+branch instructions BRN and BRNL.
 
 # Compilation
 
