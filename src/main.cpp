@@ -9,57 +9,11 @@
 #include"init.h"
 #include"Virtual_memory.h"
 #include"decode.h"
+#include"alloc_details.h"
 #include<cstring>
 #include<map>
 
 bool error_occurred;
-
-#if SHOW_ALLOC == 1
-#include <new>
-
-struct alloc_details
-{
-  word total_bytes_allocated = 0;
-  word total_bytes_free = 0;
-  word number_of_allocs = 0;
-  word number_of_frees = 0;
-
-  word current_usage()
-  {
-    return total_bytes_allocated - total_bytes_free;
-  }
-
-};
-
-static alloc_details s_alloc_details;
-
-void* operator new(std::size_t size)
-{
-    s_alloc_details.total_bytes_allocated += size;
-    s_alloc_details.number_of_allocs++;
-    ALLOC_PRINT("New object created on heap with size " << size);
-    void* result = malloc(size);
-    if (result) return result;
-    else
-      throw std::bad_alloc();
-}
-void operator delete(void* ptr)
-{
-  s_alloc_details.number_of_frees++;
-  ALLOC_PRINT("Object deleted off of heap.");
-  if (ptr)
-    free(ptr);
-}
-void* operator new[](std::size_t size)
-{
-  return operator new(size);  // defer to non-array version
-}
-void operator delete[](void* ptr)
-{
-  operator delete(ptr);  // defer to non-array version
-}
-#endif
-
 
 int main(int argc, char ** argv)
 {
@@ -82,13 +36,16 @@ int main(int argc, char ** argv)
   {
     printf("No output file specified, default %s will be used.\n", DEFAULT_OUT_FILE);
     out_file.open(DEFAULT_OUT_FILE, std::ios::out | std::ios::binary);
+    ALLOC_PRINT("This is a file handle: " << DEFAULT_OUT_FILE);
   }
   else
   {
     out_file.open(argv[2], std::ios::out | std::ios::binary);
+    ALLOC_PRINT("This is a file handle: " << argv[2]);
   }
 
   in_file.open(argv[1]);
+  ALLOC_PRINT("This is a file handle: " << argv[1]);
 
 
   if(!out_file.is_open() || !in_file.is_open())
@@ -152,9 +109,8 @@ int main(int argc, char ** argv)
   out_file.seekp(0);
   out_file.write((const char *) mem.data, mem.size);
 }
-  ALLOC_PRINT("*** Total objects allocated " << s_alloc_details.number_of_allocs);
-  ALLOC_PRINT("*** Total objects freed " << s_alloc_details.number_of_frees);
-  ALLOC_PRINT("*** Total bytes allocated " << s_alloc_details.total_bytes_allocated);
+
+  print_alloc_details();
 
   return 0;
 }

@@ -45,7 +45,7 @@ dword reserve_line_count(std::ifstream & file)
 {
   file.unsetf(std::ios_base::skipws);
   dword line_count = std::count(std::istream_iterator<char>(file), std::istream_iterator<char>(), '\n');
-  LOG(line_count);
+  
   file.clear();
   file.seekg(0);
   return line_count;

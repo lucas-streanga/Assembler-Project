@@ -56,7 +56,7 @@ $(OBJ5) : $(SRC5) $(HFILES)
 $(OBJ6) : $(SRC6) $(HFILES)
 	g++ $(INCDIR) -c $(CFLAGS) $(TCOMP) $(SHOW_ALLOCCOMP) $(SRC6) -o $(OBJ6)
 
-debug: CFLAGS = -g -Wall -DDEBUG=1
+debug: CFLAGS = -g -Wall -Wextra -DDEBUG=1
 debug: all
 
 cleanup:
