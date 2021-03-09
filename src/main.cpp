@@ -84,8 +84,6 @@ int main(int argc, char ** argv)
   dword size = get_size(input);
   CHK_ERR;
 
-  //Terminator for the input...
-
   Virtual_memory mem(size * 4);
   CHK_ERR;
 
