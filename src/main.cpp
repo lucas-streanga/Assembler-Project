@@ -103,9 +103,9 @@ int main(int argc, char ** argv)
     memcpy(mem.data + ((i - 1) * 4), &data, 4);
     i++;
   }
-  print_all_memory(mem);
   out_file.seekp(0);
   out_file.write((const char *) mem.data, mem.size);
+  print_all_memory(mem);
 }
 
   print_alloc_details();
