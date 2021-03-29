@@ -105,7 +105,9 @@ int main(int argc, char ** argv)
   }
   out_file.seekp(0);
   out_file.write((const char *) mem.data, mem.size);
+  //We can close the files now
   out_file.close();
+  in_file.close();
   print_all_memory(mem);
 }
 
