@@ -2,7 +2,7 @@
 #define _H_VIRTUAL_MEMORY
 
 #include"asm_defines.h"
-#include<stdlib.h>
+#include<cstdlib>
 
 struct Virtual_memory
 {

@@ -3,7 +3,6 @@
 
 #include<cstddef>
 #include<cstdlib>
-#include<stdexcept>
 
 template<class T>
 class buffer
@@ -18,10 +17,7 @@ public:
     this->size = size;
     data = (T*) malloc(sizeof(T) * size);
     if(data == NULL)
-    {
       size = 0;
-      throw std::bad_alloc();
-    }
   }
 
   std::size_t get_size()
@@ -31,15 +27,6 @@ public:
   T * get_buffer()
   {
     return data;
-  }
-
-  T & operator[](std::size_t index)
-  {
-    if(index >= size)
-    {
-      throw std::out_of_range();
-    }
-    return data[index];
   }
 
   ~buffer()
