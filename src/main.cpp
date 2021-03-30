@@ -10,6 +10,7 @@
 #include"Virtual_memory.h"
 #include"decode.h"
 #include"alloc_details.h"
+#include"buffer.h"
 #include<cstring>
 #include<map>
 
@@ -21,13 +22,20 @@ int main(int argc, char ** argv)
 {
   error_occurred = 0;
 
+  buffer<char> out_file_buffer(OUT_FILE_BUFFER_SIZE);
+
   std::ofstream out_file;
   std::ifstream in_file;
+
+  //Using our own buffer with its own lifetime prevents early deletion and reallocation since we close and
+  //reopen the file.
+  out_file.rdbuf()->pubsetbuf(out_file_buffer.get_buffer(), out_file_buffer.get_size());
 
   std::vector<std::string>  input;
   std::map<std::string, word>  labels;
 
   file_info info(&in_file, &input, &labels);
+  std::string out_file_name;
 
   if(argc < 2)
     error_handler(ERR_NFS, 0, &info, NULL);
@@ -35,15 +43,16 @@ int main(int argc, char ** argv)
   if(argc < 3)
   {
     printf("No output file specified, default %s will be used.\n", DEFAULT_OUT_FILE);
-    out_file.open(DEFAULT_OUT_FILE, std::ios::out | std::ios::binary);
-    ALLOC_PRINT("This is a file handle: " << DEFAULT_OUT_FILE);
+    out_file_name = DEFAULT_OUT_FILE;
   }
   else
   {
-    out_file.open(argv[2], std::ios::out | std::ios::binary);
-    ALLOC_PRINT("This is a file handle: " << argv[2]);
+    out_file_name = argv[2];
   }
 
+  //Open in append mode for now...
+  out_file.open(out_file_name, std::ios::app | std::ios::binary);
+  ALLOC_PRINT("This is a file handle: " << out_file_name);
   in_file.open(argv[1]);
   ALLOC_PRINT("This is a file handle: " << argv[1]);
 
@@ -52,6 +61,8 @@ int main(int argc, char ** argv)
     error_handler(ERR_UOF, 0, &info, argv[1]);
 
   CHK_ERR;
+  //We can close this for now.
+  out_file.close();
 
   //We will use vector reserve semantics to reduce the number of reallocs
   dword num_lines = reserve_line_count(in_file);
@@ -103,6 +114,12 @@ int main(int argc, char ** argv)
     memcpy(mem.data + ((i - 1) * 4), &data, 4);
     i++;
   }
+
+  out_file.open(out_file_name, std::ios::out | std::ios::binary);
+  if(!out_file.is_open())
+    error_handler(ERR_UOF, 0, &info, out_file_name.c_str());
+  CHK_ERR;
+
   out_file.seekp(0);
   out_file.write((const char *) mem.data, mem.size);
   //We can close the files now

@@ -39,6 +39,8 @@ extern bool error_occurred;
 //Default out file
 #define DEFAULT_OUT_FILE "a.out"
 
+//Out file buffer size.
+#define OUT_FILE_BUFFER_SIZE 8192
 
 /* Opcodes */
 #define OP_ADD    0

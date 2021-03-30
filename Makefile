@@ -15,7 +15,7 @@ EXE = Assembler
 
 INSTALL_PATH = /usr/local/bin
 
-HFILES = include/asm_defines.h include/error_handler.h include/init.h include/decode.h include/file_info.h
+HFILES = include/asm_defines.h include/error_handler.h include/init.h include/decode.h include/file_info.h include/buffer.h
 CFLAGS = -O2
 LDFLAGS =
 INCDIR = -Iinclude
