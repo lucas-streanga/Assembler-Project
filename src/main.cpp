@@ -16,6 +16,13 @@
 
 bool error_occurred;
 
+/*
+TODO:
+
+Implement labels with load and store instructions
+
+*/
+
 int main(int argc, char ** argv)
 {
   TIMER("Whole Program");
@@ -125,6 +132,7 @@ int main(int argc, char ** argv)
   //We can close the files now
   out_file.close();
   in_file.close();
+
   print_all_memory(mem);
 }
 
