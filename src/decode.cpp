@@ -123,7 +123,7 @@ word decode(file_info & info, byte op, byte cond, byte s, const std::string& res
 {
   word ret;
   if(op <= 1)
-    ret = op_addsub(info, op, cond, s, rest, ins, line);
+    ret = op_arithmetic_logic(info, op, cond, s, rest, ins, line);
   else if(op <= 9)
     ret = op_ldrstr(info, op, cond, s, rest, ins, line, labels);
   else if(op == 10)
@@ -132,9 +132,35 @@ word decode(file_info & info, byte op, byte cond, byte s, const std::string& res
     ret = op_prnm(info, op, cond, s, rest, ins, line);
   else if(op <= 13)
     ret = op_brn(info, op, cond, s, rest, ins, line, labels);
+  else if(op <= 16)
+    ret = op_arithmetic_logic(info, op, cond, s, rest, ins, line);
+  else if(op == 17)
+    ret = op_ret(info, op, cond, s, rest, ins, line);
+  else if(op <= 22)
+    ret = op_arithmetic_logic(info, op, cond, s, rest, ins, line);
+
   else if(op == OP_END)
     ret = MAX_U;
 
+  return ret;
+}
+
+word op_ret(file_info & info, byte op, byte cond, byte s, const std::string& rest, const std::string& ins, word line)
+{
+  //There are no arguments for this one at all...
+
+  if(rest.find(',') != std::string::npos)
+  {
+    //There are more than one argument...
+    error_handler(ERR_INA, line, &info, NULL);
+  }
+  CHK_ERR;
+  word ret = 0;
+
+  ret = (op << 24) | (cond << 20);
+
+  LOG("RET");
+  LOG("INSTRUCTION:\n" << (unsigned long int) ret);
   return ret;
 }
 
@@ -516,7 +542,7 @@ word op_ldrstr(file_info & info, byte op, byte cond, byte s, const std::string& 
   return ret;
 }
 
-word op_addsub(file_info & info, byte op, byte cond, byte s, const std::string& rest, const std::string& ins, word line)
+word op_arithmetic_logic(file_info & info, byte op, byte cond, byte s, const std::string& rest, const std::string& ins, word line)
 {
   dword Rd, Rn, op2, shift = 0;
   byte I = 0;
@@ -759,6 +785,24 @@ byte str_to_op(file_info & info, const std::string & opcode, char s_flag, word l
     return OP_BRN;
   else if(opcode == "brn" && s_flag == 'l')
     return OP_BRNL;
+  else if(opcode == "lsl")
+    return OP_LSL;
+  else if(opcode == "lsr")
+    return OP_LSR;
+  else if(opcode == "asr")
+    return OP_ASR;
+  else if(opcode == "ret")
+    return OP_RET;
+  else if(opcode == "mul")
+    return OP_MUL;
+  else if(opcode == "div")
+    return OP_DIV;
+  else if(opcode == "and")
+    return OP_AND;
+  else if(opcode == "lor")
+    return OP_LOR;
+  else if(opcode == "xor")
+    return OP_XOR;
   else if(opcode == "end")
     return OP_END;
   else
