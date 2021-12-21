@@ -125,7 +125,7 @@ word decode(file_info & info, byte op, byte cond, byte s, const std::string& res
   if(op <= 1)
     ret = op_addsub(info, op, cond, s, rest, ins, line);
   else if(op <= 9)
-    ret = op_ldrstr(info, op, cond, s, rest, ins, line);
+    ret = op_ldrstr(info, op, cond, s, rest, ins, line, labels);
   else if(op == 10)
     ret = op_prnr(info, op, cond, s, rest, ins, line);
   else if(op == 11)
@@ -371,23 +371,24 @@ word op_prnr(file_info & info, byte op, byte cond, byte s, const std::string& re
 
 }
 
-word op_ldrstr(file_info & info, byte op, byte cond, byte s, const std::string& rest, const std::string& ins, word line)
+word op_ldrstr(file_info & info, byte op, byte cond, byte s, const std::string& rest, const std::string& ins, word line, std::map<std::string, word> & labels)
 {
   dword Rd, Rn, immed, shift = 0;
   byte I = 0;
+  byte has_label = 0;
 
   std::stringstream ss(rest);
-  std::string arguments[3];
+  std::vector<std::string> arguments;
   byte num_args = 0;
 
   //We need to break this up with delimiting commas
-  while(ss.good() && num_args <= 3)
+  while(ss.good())
   {
     std::string str;
     getline(ss, str, ',');
     if(!str.empty())
     {
-      arguments[num_args] = str;
+      arguments.push_back(str);
       num_args++;
     }
   }
@@ -403,6 +404,8 @@ word op_ldrstr(file_info & info, byte op, byte cond, byte s, const std::string& 
   {
     if(arguments[i][0] == 'r' || arguments[i][0] == '#')
       arguments[i].erase(0, 1);
+    else if (i == 2 && arguments[i][0] == '.')
+      has_label = 1;
     else
       error_handler(ERR_URI, line, &info, NULL);
     CHK_ERR;
@@ -459,7 +462,21 @@ word op_ldrstr(file_info & info, byte op, byte cond, byte s, const std::string& 
     {
       Rd = stoll(arguments[0]);
       Rn = stoll(arguments[1]);
-      shift = stoll(arguments[2]);
+      if(has_label)
+      {
+        LOG("Label in use");
+        std::map<std::string, word>::iterator it;
+        it = labels.find(arguments[2]);
+        if(it == labels.end())
+          error_handler(ERR_UKL, line, &info, NULL);
+        CHK_ERR;
+
+        //Compute the shift from the stored value in the label map
+        shift = labs((long int) (it->second) * 4);
+        LOG("Shift: " << (int) shift);
+      }
+      else
+        shift = stoll(arguments[2]);
     }
     catch(const std::invalid_argument & e)
     {

@@ -17,7 +17,7 @@ byte str_to_s(char);
 word decode(file_info &, byte op, byte cond, byte s, const std::string &, const std::string &, word, std::map<std::string, word> & );
 
 word op_addsub(file_info &, byte op, byte cond, byte s, const std::string &, const std::string &, word);
-word op_ldrstr(file_info &, byte op, byte cond, byte s, const std::string &, const std::string &, word);
+word op_ldrstr(file_info &, byte op, byte cond, byte s, const std::string &, const std::string &, word, std::map<std::string, word> & );
 word op_prnr(file_info &, byte op, byte cond, byte s, const std::string &, const std::string &, word);
 word op_prnm(file_info &, byte op, byte cond, byte s, const std::string &, const std::string &, word);
 word op_brn(file_info &, byte op, byte cond, byte s, const std::string &, const std::string &, word, std::map<std::string, word> & );

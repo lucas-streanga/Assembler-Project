@@ -45,7 +45,7 @@ dword reserve_line_count(std::ifstream & file)
 {
   file.unsetf(std::ios_base::skipws);
   dword line_count = std::count(std::istream_iterator<char>(file), std::istream_iterator<char>(), '\n');
-  
+
   file.clear();
   file.seekg(0);
   return line_count;
@@ -182,14 +182,19 @@ dword get_size(std::vector<std::string> & input)
 void resolve_labels(std::vector<std::string> & input, std::map<std::string, word> & labels)
 {
   //Iterate thru the input and put each label with its address into the map
+  dword cur_line = 0;
   for(dword i = 0; i < input.size(); i++)
   {
+    if(input[i] == ".data")
+      cur_line--;
     if(input[i][0] == '.' && input[i] != ".data")
     {
-      labels[input[i]] = i;
+      labels[input[i]] = cur_line;
       input.erase(input.begin() + i);
       i--;
+      cur_line--;
     }
+    cur_line++;
   }
 }
 

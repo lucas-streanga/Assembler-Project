@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:bison="http://www.gnu.org/software/bison/">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
+    <title>asm_parser.y - GNU Bison XML Automaton Report</title>
+    <style type="text/css">
+      body {
+        font-family: "Nimbus Sans L", Arial, sans-serif;
+        font-size: 9pt;
+      }
+      a:link {
+        color: #1f00ff;
+        text-decoration: none;
+      }
+      a:visited {
+        color: #1f00ff;
+        text-decoration: none;
+      }
+      a:hover {
+        color: red;
+      }
+      #menu a {
+        text-decoration: underline;
+      }
+      .i {
+        font-style: italic;
+      }
+      .pre {
+        font-family: monospace;
+        white-space: pre;
+      }
+      ol.decimal {
+        list-style-type: decimal;
+      }
+      ol.lower-alpha {
+        list-style-type: lower-alpha;
+      }
+      .point {
+        color: #cc0000;
+      }
+      #footer {
+        margin-top: 3.5em;
+        font-size: 7pt;
+      }
+      </style>
+  </head>
+  <body><h1>GNU Bison XML Automaton Report</h1><p>
+    input grammar: <span class="i">asm_parser.y</span></p>
+
+<h3>Table of Contents</h3><ul id="menu"><li><a href="#reductions">Reductions</a><ul class="lower-alpha"><li><a href="#nonterminals_useless_in_grammar">Nonterminals useless in grammar</a></li><li><a href="#terminals_unused_in_grammar">Terminals unused in grammar</a></li><li><a href="#rules_useless_in_grammar">Rules useless in grammar</a></li></ul></li><li><a href="#conflicts">Conflicts</a></li><li><a href="#grammar">Grammar</a><ul class="lower-alpha"><li><a href="#grammar">Itemset</a></li><li><a href="#terminals">Terminal symbols</a></li><li><a href="#nonterminals">Nonterminal symbols</a></li></ul></li><li><a href="#automaton">Automaton</a></li></ul><h2><a name="reductions" id="reductions"></a> Reductions</h2><h3><a name="nonterminals_useless_in_grammar" id="nonterminals_useless_in_grammar"></a> Nonterminals useless in grammar</h3>
+
+<h3><a name="terminals_unused_in_grammar" id="terminals_unused_in_grammar"></a> Terminals unused in grammar</h3>
+
+<p class="pre">   UPPER
+   LOWER
+   NEWLINE
+   CHAR
+
+
+</p><h3><a name="rules_useless_in_grammar" id="rules_useless_in_grammar"></a> Rules useless in grammar</h3>
+<h2><a name="conflicts" id="conflicts"></a> Conflicts</h2>
+
+<h2><a name="grammar" id="grammar"></a> Grammar</h2>
+<p class="pre">
+<a name="rule_0" id="rule_0"></a>    0 <span class="i">$accept</span> → <span class="i">list_option</span> <b>"end of file"</b>
+
+<a name="rule_1" id="rule_1"></a>    1 <span class="i">list_option</span> → <b>"end of file"</b>
+<a name="rule_2" id="rule_2"></a>    2             | <span class="i">list</span> <b>"end of file"</b>
+
+<a name="rule_3" id="rule_3"></a>    3 <span class="i">list</span> → <span class="i">item</span>
+<a name="rule_4" id="rule_4"></a>    4      | <span class="i">list</span> <span class="i">item</span>
+
+<a name="rule_5" id="rule_5"></a>    5 <span class="i">item</span> → <b>WORD</b>
+</p>
+
+<h3><a name="terminals" id="terminals"></a> Terminals, with rules where they appear</h3>
+
+<p class="pre"><b>"end of file"</b> (0) <a href="#rule_0">0</a> <a href="#rule_1">1</a> <a href="#rule_2">2</a>
+<b>error</b> (256)
+<b>UPPER</b> (258)
+<b>LOWER</b> (259)
+<b>WORD</b> (260) <a href="#rule_5">5</a>
+<b>NEWLINE</b> (261)
+<b>CHAR</b> (262)
+</p>
+
+<h3><a name="nonterminals" id="nonterminals"></a> Nonterminals, with rules where they appear</h3>
+
+<p class="pre"><b>$accept</b> (8)
+    on left: <a href="#rule_0">0</a>
+<b>list_option</b> (9)
+    on left: <a href="#rule_1">1</a> <a href="#rule_2">2</a>
+    on right: <a href="#rule_0">0</a>
+<b>list</b> (10)
+    on left: <a href="#rule_3">3</a> <a href="#rule_4">4</a>
+    on right: <a href="#rule_2">2</a> <a href="#rule_4">4</a>
+<b>item</b> (11)
+    on left: <a href="#rule_5">5</a>
+    on right: <a href="#rule_3">3</a> <a href="#rule_4">4</a>
+</p><h2><a name="automaton" id="automaton"></a> Automaton</h2>
+
+<h3><a name="state_0" id="state_0"></a>state 0</h3>
+
+<p class="pre">  <a href="#rule_0">  0</a> <span class="i">$accept</span> → <span class="point">.</span> <span class="i">list_option</span> <b>"end of file"</b>
+  <a href="#rule_1">  1</a> <span class="i">list_option</span> → <span class="point">.</span> <b>"end of file"</b>
+  <a href="#rule_2">  2</a>             | <span class="point">.</span> <span class="i">list</span> <b>"end of file"</b>
+  <a href="#rule_3">  3</a> <span class="i">list</span> → <span class="point">.</span> <span class="i">item</span>
+  <a href="#rule_4">  4</a>      | <span class="point">.</span> <span class="i">list</span> <span class="i">item</span>
+  <a href="#rule_5">  5</a> <span class="i">item</span> → <span class="point">.</span> <b>WORD</b>
+
+    "end of file"  <a href="#state_1">shift, and go to state 1</a>
+    WORD           <a href="#state_2">shift, and go to state 2</a>
+
+    list_option  <a href="#state_3">go to state 3</a>
+    list         <a href="#state_4">go to state 4</a>
+    item         <a href="#state_5">go to state 5</a>
+</p>
+
+<h3><a name="state_1" id="state_1"></a>state 1</h3>
+
+<p class="pre">  <a href="#rule_1">  1</a> <span class="i">list_option</span> → <b>"end of file"</b> <span class="point">.</span>
+
+    $default  <a href="#rule_1">reduce using rule 1</a> (list_option)
+</p>
+
+<h3><a name="state_2" id="state_2"></a>state 2</h3>
+
+<p class="pre">  <a href="#rule_5">  5</a> <span class="i">item</span> → <b>WORD</b> <span class="point">.</span>
+
+    $default  <a href="#rule_5">reduce using rule 5</a> (item)
+</p>
+
+<h3><a name="state_3" id="state_3"></a>state 3</h3>
+
+<p class="pre">  <a href="#rule_0">  0</a> <span class="i">$accept</span> → <span class="i">list_option</span> <span class="point">.</span> <b>"end of file"</b>
+
+    "end of file"  <a href="#state_6">shift, and go to state 6</a>
+</p>
+
+<h3><a name="state_4" id="state_4"></a>state 4</h3>
+
+<p class="pre">  <a href="#rule_2">  2</a> <span class="i">list_option</span> → <span class="i">list</span> <span class="point">.</span> <b>"end of file"</b>
+  <a href="#rule_4">  4</a> <span class="i">list</span> → <span class="i">list</span> <span class="point">.</span> <span class="i">item</span>
+  <a href="#rule_5">  5</a> <span class="i">item</span> → <span class="point">.</span> <b>WORD</b>
+
+    "end of file"  <a href="#state_7">shift, and go to state 7</a>
+    WORD           <a href="#state_2">shift, and go to state 2</a>
+
+    item  <a href="#state_8">go to state 8</a>
+</p>
+
+<h3><a name="state_5" id="state_5"></a>state 5</h3>
+
+<p class="pre">  <a href="#rule_3">  3</a> <span class="i">list</span> → <span class="i">item</span> <span class="point">.</span>
+
+    $default  <a href="#rule_3">reduce using rule 3</a> (list)
+</p>
+
+<h3><a name="state_6" id="state_6"></a>state 6</h3>
+
+<p class="pre">  <a href="#rule_0">  0</a> <span class="i">$accept</span> → <span class="i">list_option</span> <b>"end of file"</b> <span class="point">.</span>
+
+    $default  accept
+</p>
+
+<h3><a name="state_7" id="state_7"></a>state 7</h3>
+
+<p class="pre">  <a href="#rule_2">  2</a> <span class="i">list_option</span> → <span class="i">list</span> <b>"end of file"</b> <span class="point">.</span>
+
+    $default  <a href="#rule_2">reduce using rule 2</a> (list_option)
+</p>
+
+<h3><a name="state_8" id="state_8"></a>state 8</h3>
+
+<p class="pre">  <a href="#rule_4">  4</a> <span class="i">list</span> → <span class="i">list</span> <span class="i">item</span> <span class="point">.</span>
+
+    $default  <a href="#rule_4">reduce using rule 4</a> (list)
+</p>
+
+<div id="footer"><hr />This document was generated using
+      <a href="http://www.gnu.org/software/bison/" title="GNU Bison">
+      GNU Bison 3.5.1</a>
+      XML Automaton Report.<br />
+      Verbatim copying and distribution of this entire page is
+      permitted in any medium, provided this notice is preserved.</div></body>
+</html>

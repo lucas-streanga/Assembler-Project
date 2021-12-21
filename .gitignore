@@ -1,7 +1,7 @@
 *.o
+*.out
 ins2.txt
 super_long_instructions.s
 test.s
-test.out
 .gcc-flags.json
 Assembler
