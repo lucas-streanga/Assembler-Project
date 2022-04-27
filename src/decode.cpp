@@ -115,20 +115,17 @@ word get_instruction(file_info & info, const std::string & s, word line, std::ma
   LOG("Conditional " << conditional << " " << (int) cond);
   LOG("S set? " << (int) sbit);
 
-  //LOG("\n\nLINEEE " << (int) line << "\n\n");
   word ret = decode(info, op, cond, sbit, rest, s, line, labels);
   return ret;
 }
 
 word decode(file_info & info, byte op, byte cond, byte s, const std::string& rest, const std::string& ins, word line, std::map<std::string, word> & labels)
 {
-  LOG("\n\nLINEEE " << (int) line << "\n\n");
   word ret;
   if(op <= 1)
     ret = op_arithmetic_logic(info, op, cond, s, rest, ins, line);
-  else if(op <= 9) {
-    LOG("\n\nLINEEE " << (int) line << "\n\n");
-    ret = op_ldrstr(info, op, cond, s, rest, ins, line, labels);}
+  else if(op <= 9) 
+    ret = op_ldrstr(info, op, cond, s, rest, ins, line, labels);
   else if(op == 10)
     ret = op_prnr(info, op, cond, s, rest, ins, line);
   else if(op == 11)
@@ -409,8 +406,6 @@ word op_ldrstr(file_info & info, byte op, byte cond, byte s, const std::string& 
   std::stringstream ss(rest);
   std::vector<std::string> arguments;
   byte num_args = 0;
-  LOG("\n\n\nLINE? " << (int) line << "\n\n");
-  LOG("Rest??" << rest << "\n");
 
   //We need to break this up with delimiting commas
   while(ss.good())
