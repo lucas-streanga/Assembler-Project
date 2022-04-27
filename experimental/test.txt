@@ -1,6 +1,4 @@
 hello world\nhi\n
 
 
-
-
 legal

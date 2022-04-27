@@ -9,6 +9,7 @@ void error_handler(word error_code, dword index, file_info * info, const char * 
     if(info->real_lines != NULL)
     {
       line = info->real_lines[index];
+      LOG("*****" << line << " *****");
       info->input_file->clear();
       info->input_file->seekg(0);
       //We need to find the actual line from the file...
