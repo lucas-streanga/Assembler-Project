@@ -11,6 +11,8 @@ OBJ4 = $(SRC4:.cpp=.o)
 OBJ5 = $(SRC5:.cpp=.o)
 OBJ6 = $(SRC6:.cpp=.o)
 
+CXX = g++
+
 EXE = Assembler
 
 INSTALL_PATH = /usr/local/bin
@@ -38,25 +40,25 @@ endif
 all : $(EXE)
 
 $(EXE) : $(OBJ1) $(OBJ2) $(OBJ3) $(OBJ4) $(OBJ5) $(OBJ6)
-	g++ -o $(EXE) $(LDFLAGS) $(OBJ1) $(OBJ2) $(OBJ3) $(OBJ4) $(OBJ5) $(OBJ6)
+	$(CXX) -o $(EXE) $(LDFLAGS) $(OBJ1) $(OBJ2) $(OBJ3) $(OBJ4) $(OBJ5) $(OBJ6)
 
 $(OBJ1) : $(SRC1) $(HFILES)
-	g++ $(INCDIR) -c $(CFLAGS) $(TCOMP) $(SHOW_ALLOCCOMP) $(SRC1) -o $(OBJ1)
+	$(CXX) $(INCDIR) -c $(CFLAGS) $(TCOMP) $(SHOW_ALLOCCOMP) $(SRC1) -o $(OBJ1)
 
 $(OBJ2) : $(SRC2) $(HFILES)
-	g++ $(INCDIR) -c $(CFLAGS) $(TCOMP) $(SHOW_ALLOCCOMP) $(SRC2) -o $(OBJ2)
+	$(CXX) $(INCDIR) -c $(CFLAGS) $(TCOMP) $(SHOW_ALLOCCOMP) $(SRC2) -o $(OBJ2)
 
 $(OBJ3) : $(SRC3) $(HFILES)
-	g++ $(INCDIR) -c $(CFLAGS) $(TCOMP) $(SHOW_ALLOCCOMP) $(SRC3) -o $(OBJ3)
+	$(CXX) $(INCDIR) -c $(CFLAGS) $(TCOMP) $(SHOW_ALLOCCOMP) $(SRC3) -o $(OBJ3)
 
 $(OBJ4) : $(SRC4) $(HFILES)
-	g++ $(INCDIR) -c $(CFLAGS) $(TCOMP) $(SHOW_ALLOCCOMP) $(SRC4) -o $(OBJ4)
+	$(CXX) $(INCDIR) -c $(CFLAGS) $(TCOMP) $(SHOW_ALLOCCOMP) $(SRC4) -o $(OBJ4)
 
 $(OBJ5) : $(SRC5) $(HFILES)
-	g++ $(INCDIR) -c $(CFLAGS) $(TCOMP) $(SHOW_ALLOCCOMP) $(SRC5) -o $(OBJ5)
+	$(CXX) $(INCDIR) -c $(CFLAGS) $(TCOMP) $(SHOW_ALLOCCOMP) $(SRC5) -o $(OBJ5)
 
 $(OBJ6) : $(SRC6) $(HFILES)
-	g++ $(INCDIR) -c $(CFLAGS) $(TCOMP) $(SHOW_ALLOCCOMP) $(SRC6) -o $(OBJ6)
+	$(CXX) $(INCDIR) -c $(CFLAGS) $(TCOMP) $(SHOW_ALLOCCOMP) $(SRC6) -o $(OBJ6)
 
 debug: CFLAGS = -g -Wall -DDEBUG=1
 debug: all
