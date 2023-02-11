@@ -108,7 +108,7 @@ int main(int argc, char ** argv)
   dword i = 0;
   while(input[i] != ".data" && input[i] != "!")
   {
-    word ins = get_instruction(info, input[i], i, labels);
+    word ins = get_instruction(info, input[i], i + 1, labels);
     CHK_ERR;
     memcpy(mem.data + (i * 4), &ins, 4);
     i++;
