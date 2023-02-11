@@ -21,7 +21,6 @@ void LS::Driver::parse( std::istream &stream )
    {
        return;
    }
-   //else
    parse_helper( stream );
    return;
 }

@@ -16,6 +16,13 @@
 
 bool error_occurred;
 
+/*
+TODO:
+
+Implement labels with load and store instructions
+
+*/
+
 int main(int argc, char ** argv)
 {
   TIMER("Whole Program");
@@ -101,7 +108,7 @@ int main(int argc, char ** argv)
   dword i = 0;
   while(input[i] != ".data" && input[i] != "!")
   {
-    word ins = get_instruction(info, input[i], i+1, labels);
+    word ins = get_instruction(info, input[i], i, labels);
     CHK_ERR;
     memcpy(mem.data + (i * 4), &ins, 4);
     i++;
@@ -125,6 +132,7 @@ int main(int argc, char ** argv)
   //We can close the files now
   out_file.close();
   in_file.close();
+
   print_all_memory(mem);
 }
 

@@ -57,6 +57,17 @@ extern bool error_occurred;
 #define OP_PRNM   11
 #define OP_BRN    12
 #define OP_BRNL   13
+#define OP_LSL    14
+#define OP_LSR    15
+#define OP_ASR    16
+#define OP_RET    17
+#define OP_MUL    18
+#define OP_DIV    19
+#define OP_AND    20
+#define OP_LOR    21
+#define OP_XOR    22
+#define OP_POP    23
+#define OP_PUSH   24
 
 #define OP_END    255
 
